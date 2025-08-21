@@ -1,4 +1,4 @@
-import { Dimensions, Pressable, StyleSheet, View, Text } from "react-native";
+import { Dimensions, Pressable, StyleSheet, Text, View } from "react-native";
 
 interface PanelType {
   title: string,
