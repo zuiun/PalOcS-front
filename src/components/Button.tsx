@@ -4,6 +4,7 @@ export default function Button ({ title, colour }: Readonly<{ title: string, col
   return (
     <View style = { styles.panel }>
       <Pressable style = {[ styles.button, { backgroundColor: colour } ]} onPress = {
+        // TODO: custom handler
         () => alert ("bruh")
       }>
         <Text style = { styles.text }>{ title }</Text>
@@ -14,14 +15,14 @@ export default function Button ({ title, colour }: Readonly<{ title: string, col
 
 const styles = StyleSheet.create ({
   panel: {
-    width: 0.2 * Dimensions.get ("window").height,
-    height: 0.2 * Dimensions.get ("window").height,
+    width: 0.15 * Dimensions.get ("window").height,
+    height: 0.15 * Dimensions.get ("window").height,
   },
   button: {
     flex: 1,
     justifyContent: "center",
     alignItems: "center",
-    borderRadius: 10,
+    borderRadius: 0.01 * Dimensions.get ("window").height,
   },
   text: {
     color: "#fff",
