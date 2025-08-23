@@ -1,0 +1,4 @@
+use backend cache to generate lists of all products
+populate all grids using cache
+consider using prefetch on Link - currently, it breaks everything (probably because prefetch is on root layout)
+transaction list needs to be persistent

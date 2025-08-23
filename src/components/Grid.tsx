@@ -1,64 +1,53 @@
-import { Dimensions, Pressable, StyleSheet, Text, View } from "react-native";
+import { Href, Link } from "expo-router";
+import React from "react";
+import { Dimensions, GestureResponderEvent, Pressable, StyleSheet, Text, View } from "react-native";
 
-interface PanelType {
-  title: string,
-  colour: string,
-}
-
-function Panel ({ title, colour }: Readonly<{ title: string, colour: string }>) {
-  return (
-    <View style = { styles.panel }>
-      <Pressable style = {[ styles.button, { backgroundColor: colour } ]} onPress = {
-        // TODO: custom handler
-        () => alert ("bruh")
-      }>
-        <Text style = { styles.text }>{ title }</Text>
-      </Pressable>
-    </View>
+export function Panel ({ href, title, colour = "red", onPress }: Readonly<{ href?: Href, title: string, colour?: string, onPress?: (event: GestureResponderEvent) => void }>) {
+  const panel = (
+    <Pressable style = {[ styles.panel, { backgroundColor: colour } ]} onPress = { onPress }>
+      <Text style = { styles.text }>{ title }</Text>
+    </Pressable>
   );
+
+  if (href) {
+    return (
+      <Link href = { href }>
+        { panel }
+      </Link>
+    );
+  } else {
+    return panel;
+  }
 }
 
-export default function Grid ({ panels }: Readonly<{ panels: PanelType[] }>) {
+export default function Grid ({ children, align }: Readonly<{ children: React.ReactNode, align: number }>) {
   const paddings: React.ReactElement[] = [];
+  const width = align * (styles.panel.width + 0.02 * Dimensions.get ("window").height);
 
-  for (let i = panels.length; i % 5 > 0; ++ i) {
+  for (let i = React.Children.count (children); i % align > 0; ++ i) {
     paddings.push (<View key = { i } style = { styles.panel }/>);
   }
 
   return (
-    <View style = { styles.grid }>
-      {
-        panels.map ((panel, i) => {
-          return <Panel key = { i } title = { panel.title } colour = { panel.colour }/>;
-        })
-      }
-      {
-        paddings.map (padding => { return padding })
-      }
+    <View style = {[ styles.container, { width: width } ]}>
+      { children }
+      { paddings.map (padding => padding) }
     </View>
   );
 }
 
-// <Child value={foo} onEvent={handleEvent}/>
-// <Child onEvent={() => handleEvent(foo)} />
-
 const styles = StyleSheet.create ({
-  grid: {
-    width: 0.8 * Dimensions.get ("window").height,
-    height: 0.8 * Dimensions.get ("window").height,
+  container: {
     flexDirection: "row",
+    justifyContent: "space-evenly",
+    alignContent: "space-between",
     flexWrap: "wrap",
-    justifyContent: "space-between",
-    // TODO: this is temporary just to see
-    borderColor: "#ff00ff",
-    borderWidth: 2,
+    rowGap: 0.02 * Dimensions.get ("window").height,
+    columnGap: 0.02 * Dimensions.get ("window").height,
   },
   panel: {
     width: 0.15 * Dimensions.get ("window").height,
     height: 0.15 * Dimensions.get ("window").height,
-  },
-  button: {
-    flex: 1,
     justifyContent: "center",
     alignItems: "center",
     borderRadius: 0.01 * Dimensions.get ("window").height,

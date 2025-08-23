@@ -1,10 +1,12 @@
-import { Dimensions, Pressable, StyleSheet, Text, View } from "react-native";
+import { Pressable, StyleSheet, Text, View } from "react-native";
 
 interface ItemType {
   title: string,
 }
 
 function Item ({ title }: Readonly<{ title: string }>) {
+  // TODO: items need to be indentable
+  // or do they???
   return (
     <View style = { styles.item }>
       <Pressable onPress = {
@@ -17,45 +19,27 @@ function Item ({ title }: Readonly<{ title: string }>) {
   );
 }
 
-export default function List ({ items }: Readonly<{ items: ItemType[] }>) {
-  const paddings: React.ReactElement[] = [];
-
-  for (let i = items.length; i % 5 > 0; ++ i) {
-    paddings.push (<View key = { i } style = { styles.item }/>);
-  }
-
+export default function List ({ items }: Readonly<{ items: ItemType[ ]}>) {
   return (
     <View style = { styles.list }>
-      {
-        items.map ((item, i) => {
-          return <Item key = { i } title = { item.title }/>;
-        })
-      }
-      {
-        paddings.map (padding => { return padding })
-      }
+      { items.map ((item, i) => <Item key = { i } title = { item.title }/>) }
     </View>
   );
 }
 
-// <Child value={foo} onEvent={handleEvent}/>
-// <Child onEvent={() => handleEvent(foo)} />
-
 const styles = StyleSheet.create ({
   list: {
-    width: 0.8 * Dimensions.get ("window").height,
-    height: 0.8 * Dimensions.get ("window").height,
+    width: "100%",
+    height: "100%",
     overflow: "scroll",
     justifyContent: "flex-start",
-    rowGap: 0.02 * Dimensions.get ("window").height,
     // TODO: this is temporary just to see
     borderColor: "#ff00ff",
-    borderWidth: 2,
+    borderWidth: 1,
   },
   item: {
-    // height: 0.4 * Dimensions.get ("window").height,
     borderColor: "#fff",
-    borderBottomWidth: 0.005 * Dimensions.get ("window").height,
+    borderBottomWidth: 1,
   },
   text: {
     color: "#fff",
