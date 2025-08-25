@@ -1,30 +1,44 @@
 import { Slot } from "expo-router";
+import { createContext } from "react";
 import { StyleSheet, View } from "react-native";
+import { QueryClient, QueryClientProvider } from "@tanstack/react-query"
 import List from "@/components/List";
 import Section from "@/components/Section";
 import Grid, { Panel } from "@/components/Grid";
+import { colourSpecial, colourTab } from "@/constants/globals";
+import { Product } from "@/constants/types";
 
-export default function Layout () {
+export const TransactionsContext = createContext<Product[]> ([]);
+const queryClient = new QueryClient ();
+
+export default function RootLayout () {
   return (
-    <View style = {[ styles.screen ]}>
-      <View style = {[ styles.row, { flex: 4 } ]}>
-        <View style = {[ styles.container, { flex: 4 } ]}>
-          <Slot/>
+    <QueryClientProvider client = { queryClient }>
+      <TransactionsContext value = {[]}>
+        <View style = {[ styles.screen ]}>
+          <View style = {[ styles.row, { flex: 4 } ]}>
+            <View style = {[ styles.container, { flex: 4 } ]}>
+              <Slot/>
+            </View>
+            <View style = {{ flex: 1 }}>
+              <Section title = "Transaction" height = "100%">
+                <List items = {[]}/>
+              </Section>
+            </View>
+          </View>
+          <View style = {[ styles.row, { flex: 1 } ]}>
+            <Grid align = { 2 }>
+              <Panel href = "/drink" title = "Drink" colour = { colourTab }/>
+              <Panel href = "/customisation" title = "Customisation" colour = { colourTab }/>
+            </Grid>
+            <Grid align = { 2 }>
+              <Panel href = "/pay" title = "Pay" colour = { colourSpecial }/>
+              <Panel href = "/" title = "Exit" colour = { colourSpecial }/>
+            </Grid>
+          </View>
         </View>
-        <View style = {{ flex: 1 }}>
-          <Section title = "Transaction" height = "100%">
-            <List items = {[]}/>
-          </Section>
-        </View>
-      </View>
-      <View style = {[ styles.row, { flex: 1 } ]}>
-        <Grid align = { 3 }>
-          <Panel href = "/" title = "Drink" colour = "green"/>
-          <Panel href = "/customisation" title = "Customisation" colour = "green"/>
-          <Panel href = "/pay" title = "Pay" colour = "purple"/>
-        </Grid>
-      </View>
-    </View>
+      </TransactionsContext>
+    </QueryClientProvider>
   );
 }
 

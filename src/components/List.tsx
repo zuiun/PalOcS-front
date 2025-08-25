@@ -19,7 +19,7 @@ function Item ({ title }: Readonly<{ title: string }>) {
   );
 }
 
-export default function List ({ items }: Readonly<{ items: ItemType[ ]}>) {
+export default function List ({ items }: Readonly<{ items: ItemType[] }>) {
   return (
     <View style = { styles.list }>
       { items.map ((item, i) => <Item key = { i } title = { item.title }/>) }

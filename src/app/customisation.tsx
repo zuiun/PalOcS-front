@@ -1,50 +1,93 @@
-import { createContext } from "react";
+import { useQuery } from "@tanstack/react-query";
 import Grid, { Panel } from "@/components/Grid";
 import Section from "@/components/Section";
+import Query from "@/components/Query";
+import { Category, Product } from "@/constants/types";
 
-// todo: this should be populated on app startup
-const MilkIdsContext = createContext ([0]);
-const SyrupIdsContext = createContext ([0]);
-const ToppingIdsContext = createContext ([0]);
+export default function Customisation () {
+  const getCategories = async () => {
+    try {
+      const response = await fetch (`${process.env.EXPO_PUBLIC_API_URL}/customisation/categories`);
 
-export default function Topping () {
+      if (response.ok) {
+        return await response.json ();
+      } else {
+        throw new Error (`Fetch Error: ${response.status}`);
+      }
+    } catch (error) {
+      console.log (error);
+    }
+  };
+  const getCustomisations = async () => {
+    try {
+      const response = await fetch (`${process.env.EXPO_PUBLIC_API_URL}/customisation`);
+
+      if (response.ok) {
+        return await response.json ();
+      } else {
+        throw new Error (`Fetch Error: ${response.status}`);
+      }
+    } catch (error) {
+      console.log (error);
+    }
+  };
+  const categories = useQuery ({ queryKey: [`/customisation/categories`], queryFn: getCategories });
+  const customisations = useQuery ({ queryKey: [`/customisation`], queryFn: getCustomisations });
+
   return (
     <>
-      <MilkIdsContext value = {[ 0, 1, 2, 3, 4, 5 ]}>
-        <Section title = "Milk">
-          <Grid align = { 6 }>
-            <Panel title = "2%"/>
-            <Panel title = "Whole"/>
-            <Panel title = "Skim"/>
-            <Panel title = "Almond"/>
-            <Panel title = "Oat"/>
-            <Panel title = "Soy"/>
-          </Grid>
-        </Section>
-      </MilkIdsContext>
-      <SyrupIdsContext value = {[ 0, 1, 2, 3, 4, 5, 6, 7 ]}>
-        <Section title = "Syrup">
-          <Grid align = { 6 }>
-            <Panel title = "Sugar"/>
-            <Panel title = "Vanilla"/>
-            <Panel title = "French Vanilla"/>
-            <Panel title = "Caramel"/>
-            <Panel title = "Chocolate"/>
-            <Panel title = "White Chocolate"/>
-            <Panel title = "Mint"/>
-            <Panel title = "Hazelnut"/>
-          </Grid>
-        </Section>
-      </SyrupIdsContext>
-      <ToppingIdsContext value = {[ 0, 1, 2 ]}>
-        <Section title = "Topping">
-          <Grid align = { 6 }>
-            <Panel title = "Whipped Cream"/>
-            <Panel title = "Cinnamon"/>
-            <Panel title = "Espresso"/>
-          </Grid>
-        </Section>
-      </ToppingIdsContext>
+      <Query result = { categories }>
+        <Query result = { customisations }>
+          {
+            categories.data?.map ((ca: Category) =>
+              <Section key = { ca.id } title = { ca.name }>
+                <Grid align = { 8 }>
+                  {
+                    customisations.data?.filter ((cu: Product) => cu.category_id === ca.id)
+                        .map ((cu: Product) => <Panel key = { cu.id } title = { cu.name }/>)
+                  }
+                </Grid>
+              </Section>
+            )
+          }
+        </Query>
+      </Query>
     </>
   );
 }
+
+
+    // <>
+    //   {
+    //     categories.isPending ?
+    //       <ActivityIndicator/>
+    //     :
+    //     categories.isError ?
+    //       <Text style = { styles.text }>
+    //         Error
+    //       </Text>
+    //     :
+    //       <Grid align = { 4 }>
+    //         {
+    //           categories.data?.map ((ca: Category) => 
+    //             <Section key = { ca.id } title = { ca.name }>
+    //               <Grid align = { 8 }>
+    //                 {
+    //                   customisations.isPending ?
+    //                     <ActivityIndicator/>
+    //                   :
+    //                   customisations.isError ?
+    //                     <Text style = { styles.text }>
+    //                       Error
+    //                     </Text>
+    //                   :
+    //                     customisations.data?.filter ((cu) => cu.category_id === ca.id)
+    //                         .map ((cu, j) => <Panel key = { j } title = { cu.name }/>)
+    //                 }
+    //               </Grid>
+    //             </Section>
+    //           )
+    //         }
+    //       </Grid>
+    //   }
+    // </>
