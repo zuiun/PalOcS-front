@@ -1,12 +1,13 @@
 import { router, useLocalSearchParams } from "expo-router";
-import { useEffect, useState } from "react";
+import { useContext, useEffect, useState } from "react";
 import { StyleSheet, View } from "react-native";
 import { useQuery } from "@tanstack/react-query";
 import Grid, { Panel } from "@/components/Grid";
 import Section from "@/components/Section";
 import Query from "@/components/Query";
-import { colourDefault, colourSelected, uninitialisedIdx } from "@/constants/globals";
-import { Category, Drink } from "@/constants/types";
+import TransactionsContext from "@/contexts/TransactionsContext";
+import { colourDefault, colourSelected, uninitialisedIdx } from "@/utils/globals";
+import { Category, Drink } from "@/utils/types";
 
 export default function Drinks () {  
   const { drink }: { drink: string } = useLocalSearchParams ();
@@ -39,6 +40,7 @@ export default function Drinks () {
   const [sizeIdx, setSizeIdx] = useState (uninitialisedIdx);
   const categories = useQuery ({ queryKey: [`/drink/${drink}/categories`], queryFn: getCategories });
   const drinks = useQuery ({ queryKey: [`/drink/${drink}`], queryFn: getDrinks });
+  const transactions = useContext (TransactionsContext);
 
   useEffect (() => {
     if (sizeIdx > uninitialisedIdx) {
@@ -67,7 +69,44 @@ export default function Drinks () {
                     <Grid align = { 6 }>
                       {
                         drinks.data?.filter ((d: Drink) => d.category_id === c.id)
-                          .map ((d: Drink) => <Panel key = { d.id } title = { d.name }/>)
+                          .map ((d: Drink) =>
+                            <Panel key = { d.id } title = { d.name } onPress = { () => {
+                              if (sizeIdx > uninitialisedIdx) {
+                                if (sizeIdx < d.price.length) {
+                                  let size = "";
+
+                                  switch (sizeIdx) {
+                                    case 0:
+                                      size = "Small";
+                                      break;
+                                    case 1:
+                                      size = "Medium";
+                                      break;
+                                    case 2:
+                                      size = "Large";
+                                      break;
+                                  }
+
+                                  transactions.add ({
+                                    id: d.id,
+                                    type: drink,
+                                    category_id: d.category_id,
+                                    name: `${d.name} ${size}`,
+                                    price: d.price[sizeIdx],
+                                  });
+                                // Not an error; use default price
+                                } else {
+                                  transactions.add ({
+                                    id: d.id,
+                                    type: drink,
+                                    category_id: d.category_id,
+                                    name: `${d.name} Small`,
+                                    price: d.price[0],
+                                  });
+                                }
+                              }
+                            }}/>
+                          )
                       }
                     </Grid>
                   </Section>

@@ -1,6 +1,6 @@
 import Grid, { Panel } from "@/components/Grid";
 import Section from "@/components/Section";
-import { colourDefault } from "@/constants/globals";
+import { colourDefault } from "@/utils/globals";
 
 export default function Drink () {
   return (

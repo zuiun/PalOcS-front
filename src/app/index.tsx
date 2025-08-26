@@ -1,8 +1,7 @@
-import { createContext } from "react";
 import { StyleSheet, Text } from "react-native";
 import Grid, { Panel } from "@/components/Grid";
 import Section from "@/components/Section";
-import { colourDefault } from "@/constants/globals";
+import { colourDefault } from "@/utils/globals";
 
 // change to login page
 export default function Index () {

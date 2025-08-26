@@ -1,3 +1,4 @@
-transaction list needs to be persistent
-change index to a login screen
+change index to a login screen > factor out stuff into a Screen, especially list and void
+switch everything to [id] eventually
 set consistent text sizes
+probably gonna convert a bunch of these components into more specific ones because the indents and inlined code are crazy

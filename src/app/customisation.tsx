@@ -1,8 +1,10 @@
+import { useContext } from "react";
 import { useQuery } from "@tanstack/react-query";
 import Grid, { Panel } from "@/components/Grid";
 import Section from "@/components/Section";
 import Query from "@/components/Query";
-import { Category, Product } from "@/constants/types";
+import TransactionsContext from "@/contexts/TransactionsContext";
+import { Category, Product } from "@/utils/types";
 
 export default function Customisation () {
   const getCategories = async () => {
@@ -33,6 +35,7 @@ export default function Customisation () {
   };
   const categories = useQuery ({ queryKey: [`/customisation/categories`], queryFn: getCategories });
   const customisations = useQuery ({ queryKey: [`/customisation`], queryFn: getCustomisations });
+  const transactions = useContext (TransactionsContext);
 
   return (
     <>
@@ -44,7 +47,16 @@ export default function Customisation () {
                 <Grid align = { 8 }>
                   {
                     customisations.data?.filter ((cu: Product) => cu.category_id === ca.id)
-                        .map ((cu: Product) => <Panel key = { cu.id } title = { cu.name }/>)
+                        .map ((cu: Product) =>
+                          <Panel key = { cu.id } title = { cu.name } onPress = { () =>
+                            transactions.add ({
+                              id: cu.id,
+                              type: "customisations",
+                              category_id: cu.category_id,
+                              name: cu.name,
+                              price: cu.price,
+                          })}/>
+                        )
                   }
                 </Grid>
               </Section>
@@ -55,39 +67,3 @@ export default function Customisation () {
     </>
   );
 }
-
-
-    // <>
-    //   {
-    //     categories.isPending ?
-    //       <ActivityIndicator/>
-    //     :
-    //     categories.isError ?
-    //       <Text style = { styles.text }>
-    //         Error
-    //       </Text>
-    //     :
-    //       <Grid align = { 4 }>
-    //         {
-    //           categories.data?.map ((ca: Category) => 
-    //             <Section key = { ca.id } title = { ca.name }>
-    //               <Grid align = { 8 }>
-    //                 {
-    //                   customisations.isPending ?
-    //                     <ActivityIndicator/>
-    //                   :
-    //                   customisations.isError ?
-    //                     <Text style = { styles.text }>
-    //                       Error
-    //                     </Text>
-    //                   :
-    //                     customisations.data?.filter ((cu) => cu.category_id === ca.id)
-    //                         .map ((cu, j) => <Panel key = { j } title = { cu.name }/>)
-    //                 }
-    //               </Grid>
-    //             </Section>
-    //           )
-    //         }
-    //       </Grid>
-    //   }
-    // </>

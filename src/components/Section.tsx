@@ -18,13 +18,13 @@ const styles = StyleSheet.create ({
     rowGap: 0.01 * Dimensions.get ("window").height,
   },
   title: {
-    width: "100%",
     textAlign: "center",
     color: "#fff",
-    flex: 0,
+    marginTop: 0.01 * Dimensions.get ("window").height,
   },
   contents: {
     width: "100%",
     flex: 1,
+    marginBottom: 0.04 * Dimensions.get ("window").height,
   }
 });
