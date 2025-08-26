@@ -2,16 +2,16 @@ import { createContext, useEffect, useState } from "react";
 import AsyncStorage from "@react-native-async-storage/async-storage";
 import { Discount, Purchase } from "@/utils/types";
 
-interface Transactions {
-  transactions: Purchase[],
+interface Transaction {
+  purchases: Purchase[],
   add: (purchase: Purchase) => void,
   remove: (idxs: number[]) => void,
   clear: () => void,
   setDiscount: (idx: number, discount: Discount) => void,
 }
 
-const TransactionsContext = createContext<Transactions> ({
-  transactions: [],
+const TransactionsContext = createContext<Transaction> ({
+  purchases: [],
   add: (purchase: Purchase) => {
     throw new Error ("Not Implemented");
   },
@@ -112,7 +112,7 @@ export function TransactionsProvider ({ children }: Readonly<{ children: React.R
   }, [isInit]);
 
   return (
-    <TransactionsContext.Provider value = {{ transactions, add, remove, clear, setDiscount }}>
+    <TransactionsContext.Provider value = {{ purchases: transactions, add, remove, clear, setDiscount }}>
       { children }
     </TransactionsContext.Provider>
   );

@@ -1,11 +1,12 @@
 import { Href, Link } from "expo-router";
 import React from "react";
-import { Dimensions, GestureResponderEvent, Pressable, StyleSheet, Text, View } from "react-native";
+import { Dimensions, GestureResponderEvent, Pressable, StyleSheet, View } from "react-native";
+import Paragraph from "@/components/Paragraph";
 
 export function Panel ({ href, title, colour = "red", onPress }: Readonly<{ href?: Href, title: string, colour?: string, onPress?: (event: GestureResponderEvent) => void }>) {
   const panel = (
     <Pressable style = {[ styles.panel, { backgroundColor: colour } ]} onPress = { onPress }>
-      <Text style = { styles.text }>{ title }</Text>
+      <Paragraph>{ title }</Paragraph>
     </Pressable>
   );
 
@@ -51,8 +52,5 @@ const styles = StyleSheet.create ({
     justifyContent: "center",
     alignItems: "center",
     borderRadius: 0.01 * Dimensions.get ("window").height,
-  },
-  text: {
-    color: "#fff",
   },
 });

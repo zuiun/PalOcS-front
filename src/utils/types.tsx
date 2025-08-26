@@ -31,3 +31,17 @@ export interface Purchase {
   price: number,
   discount?: Discount,
 }
+
+export interface Item {
+    product_name: string,
+    price: number,
+    discount_name?: string,
+    discount_value?: string,
+}
+
+export interface Transaction {
+    id: number,
+    user_id: string,
+    payment: string,
+    purchases: Item[],
+}

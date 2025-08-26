@@ -1,4 +1,3 @@
-change index to a login screen > factor out stuff into a Screen, especially list and void
-switch everything to [id] eventually
-set consistent text sizes
-probably gonna convert a bunch of these components into more specific ones because the indents and inlined code are crazy
+print receipt (Modal) upon payment
+reprint receipt (Modal) from database
+maybe add support for returns (requires re-architecting database)

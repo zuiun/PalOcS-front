@@ -51,15 +51,15 @@ export default function Drinks () {
   return (
     <View style = {[ styles.screen ]}>
       <View style = {[ styles.row, { flex: 4 } ]}>
-      <View style = {[ styles.container, { flex: 1 } ]}>
-        <Section title = "Size">
-          <Grid align = { 1 }>
-            <Panel title = "Small" colour = { sizeIdx === 0 ? colourSelected : colourDefault } onPress = { () => setSizeIdx (0) }/>
-            <Panel title = "Medium" colour = { sizeIdx === 1 ? colourSelected : colourDefault } onPress = { () => setSizeIdx (1) }/>
-            <Panel title = "Large" colour = { sizeIdx === 2 ? colourSelected : colourDefault } onPress = { () => setSizeIdx (2) }/>
-          </Grid>
-        </Section>
-      </View>
+        <View style = {[ styles.container, { flex: 1 } ]}>
+          <Section title = "Size">
+            <Grid align = { 1 }>
+              <Panel title = "Small" colour = { sizeIdx === 0 ? colourSelected : colourDefault } onPress = { () => setSizeIdx (0) }/>
+              <Panel title = "Medium" colour = { sizeIdx === 1 ? colourSelected : colourDefault } onPress = { () => setSizeIdx (1) }/>
+              <Panel title = "Large" colour = { sizeIdx === 2 ? colourSelected : colourDefault } onPress = { () => setSizeIdx (2) }/>
+            </Grid>
+          </Section>
+        </View>
         <View style = {[ styles.container, { flex: 4 } ]}>
           <Query result = { categories }>
             <Query result = { drinks }>
@@ -77,13 +77,13 @@ export default function Drinks () {
 
                                   switch (sizeIdx) {
                                     case 0:
-                                      size = "Small";
+                                      size = "(S)";
                                       break;
                                     case 1:
-                                      size = "Medium";
+                                      size = "(M)";
                                       break;
                                     case 2:
-                                      size = "Large";
+                                      size = "(L)";
                                       break;
                                   }
 
@@ -100,7 +100,7 @@ export default function Drinks () {
                                     id: d.id,
                                     type: drink,
                                     category_id: d.category_id,
-                                    name: `${d.name} Small`,
+                                    name: `${d.name} (S)`,
                                     price: d.price[0],
                                   });
                                 }
@@ -122,7 +122,6 @@ export default function Drinks () {
 
 const styles = StyleSheet.create ({
   screen: {
-    backgroundColor: "#25292e",
     width: "100%",
     height: "100%",
   },
@@ -136,7 +135,4 @@ const styles = StyleSheet.create ({
     alignContent: "center",
     alignItems: "center"
   },
-  text: {
-    color: "#fff",
-  }
 });

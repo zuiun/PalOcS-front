@@ -1,5 +1,5 @@
 import { Redirect } from "expo-router";
 
-export default function NotFoundScreen () {
+export default function NotFound () {
   return <Redirect href = "/"/>;
 }

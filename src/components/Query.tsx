@@ -1,5 +1,6 @@
 import { UseQueryResult } from "@tanstack/react-query";
-import { ActivityIndicator, StyleSheet, Text, View } from "react-native";
+import { ActivityIndicator, StyleSheet, View } from "react-native";
+import Paragraph from "@/components/Paragraph";
 
 export default function Query ({ children, result }: Readonly<{ children: React.ReactNode, result: UseQueryResult }>) {
   if (result.isError) {
@@ -7,9 +8,9 @@ export default function Query ({ children, result }: Readonly<{ children: React.
 
     return (
       <View style = { styles.container }>
-        <Text style = { styles.text }>
+        <Paragraph>
           Error
-        </Text>
+        </Paragraph>
       </View>
     );
   } else if (result.isPending) {
@@ -26,8 +27,5 @@ export default function Query ({ children, result }: Readonly<{ children: React.
 const styles = StyleSheet.create ({
   container: {
     alignItems: "center",
-  },
-  text: {
-    color: "#fff",
   },
 });
