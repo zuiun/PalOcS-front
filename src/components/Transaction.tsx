@@ -1,4 +1,4 @@
-import { useContext } from "react";
+import { useContext, useState } from "react";
 import { Dimensions, FlatList, Pressable, StyleSheet, View } from "react-native";
 import Paragraph from "@/components/Paragraph";
 import TransactionsContext from "@/contexts/TransactionsContext";
@@ -27,34 +27,48 @@ function calculatePrice (price: number, discount?: number) {
 export default function Transaction () {
   const transactions = useContext (TransactionsContext);
   const selectedIdxs = useContext (SelectedIdxsContext);
+  let priceTotal: number = 0;
+
+  transactions.purchases.forEach ((p) => priceTotal += calculatePrice (p.price, p.discount?.value));
 
   return (
-    <FlatList contentContainerStyle = { styles.list } data = { transactions.purchases } keyExtractor = { (item, index) => `${item.id}-${item.category_id}-${index}` }
-    renderItem = { ({item, index}) => {
-      let price = calculatePrice (item.price, item.discount?.value);
+    <>
+      <FlatList contentContainerStyle = {[ styles.list ]} data = { transactions.purchases }
+          keyExtractor = { (item, index) => `${item.id}-${item.category_id}-${index}` }
+          renderItem = { ({item, index}) => {
+        let price = calculatePrice (item.price, item.discount?.value);
 
-      return (
-        <View key = { index } style = {[ styles.item, selectedIdxs.selectedIdxs.includes (index) && styles.selected ]}>
-          <Pressable style = { styles.container } onPress = { () => {
-            if (selectedIdxs.selectedIdxs.includes (index)) {
-              selectedIdxs.remove (index);
-            } else {
-              selectedIdxs.add (index);
-            }
-          } }>
-            <Paragraph style = {[ styles.name, { flex: 3} ]}>
-              { item.name }
-            </Paragraph>
-            { item.discount && <Paragraph style = {[ styles.discount, { flex: 3} ]}>
-              {item.discount.name} -{ item.discount.value }%
-            </Paragraph> }
-            <Paragraph style = {[ styles.price, { flex: 1} ]}>
-              { convertPrice (price) }
-            </Paragraph>
-          </Pressable>
-        </View>
-      );
-    } }/>
+        return (
+          <View key = { index } style = {[ styles.item, selectedIdxs.selectedIdxs.includes (index) && styles.selected ]}>
+            <Pressable style = { styles.container } onPress = { () => {
+              if (selectedIdxs.selectedIdxs.includes (index)) {
+                selectedIdxs.remove (index);
+              } else {
+                selectedIdxs.add (index);
+              }
+            } }>
+              <Paragraph style = {[ styles.name, { flex: 3} ]}>
+                { item.name }
+              </Paragraph>
+              { item.discount && <Paragraph style = {[ styles.discount, { flex: 3} ]}>
+                {item.discount.name} -{ item.discount.value }%
+              </Paragraph> }
+              <Paragraph style = {[ styles.price, { flex: 1} ]}>
+                { convertPrice (price) }
+              </Paragraph>
+            </Pressable>
+          </View>
+        );
+      } }/>
+      <View style = {[ styles.item, styles.total, styles.container ]}>
+        <Paragraph style = {[ styles.name, { flex: 4} ]}>
+          Total
+        </Paragraph>
+        <Paragraph style = {[ styles.price, { flex: 1} ]}>
+          { convertPrice (priceTotal) }
+        </Paragraph>
+      </View>
+    </>
   );
 }
 
@@ -70,6 +84,13 @@ const styles = StyleSheet.create ({
   item: {
     borderColor: "#fff",
     borderBottomWidth: 1,
+  },
+  total: {
+    alignItems: "center",
+    borderLeftWidth: 1,
+    borderRightWidth: 1,
+    paddingTop: 0.01 * Dimensions.get ("window").height,
+    paddingBottom: 0.01 * Dimensions.get ("window").height,
   },
   container: {
     flexDirection: "row",

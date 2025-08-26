@@ -1,3 +1,4 @@
+import { useRouter } from "expo-router";
 import { useContext } from "react";
 import { useMutation, useQuery } from "@tanstack/react-query";
 import Grid, { Panel } from "@/components/Grid";
@@ -9,6 +10,7 @@ import UserContext from "@/contexts/UserContext";
 import { Discount } from "@/utils/types";
 
 export default function Pay () {
+  const router = useRouter ();
   const getDiscounts = async () => {
     try {
       const response = await fetch (`${process.env.EXPO_PUBLIC_API_URL}/discount`);
@@ -63,9 +65,10 @@ export default function Pay () {
 
       transactions.clear ();
       // TODO: Display receipt with ID
+      // TODO: reroute to menu after dismissing receipt
+      // router.replace ("/drink");
     }
   };
-  
 
   return (
     <>
