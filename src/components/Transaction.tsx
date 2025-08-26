@@ -7,7 +7,7 @@ import SelectedIdxsContext from "@/contexts/SelectedIdxsContext";
 function convertPrice (price: number) {
   const dollars = Math.floor (price / 1_00);
   const cents = price % 1_00;
-  const centsPadded = `${cents}`.padEnd (2, "0");
+  const centsPadded = `${cents}`.padStart (2, "0");
 
   return `$${dollars},${centsPadded}`;
 }
@@ -24,7 +24,7 @@ function calculatePrice (price: number, discount?: number) {
   }
 }
 
-export default function List () {
+export default function Transaction () {
   const transactions = useContext (TransactionsContext);
   const selectedIdxs = useContext (SelectedIdxsContext);
 

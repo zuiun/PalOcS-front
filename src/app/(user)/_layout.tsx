@@ -2,8 +2,8 @@ import { Redirect, Slot } from "expo-router";
 import { useContext } from "react";
 import { StyleSheet, View } from "react-native";
 import Footer from "@/components/Footer";
-import List from "@/components/List";
 import Section from "@/components/Section";
+import Transaction from "@/components/Transaction";
 import { SelectedIdxsProvider } from "@/contexts/SelectedIdxsContext";
 import { TransactionsProvider } from "@/contexts/TransactionsContext";
 import UserContext from "@/contexts/UserContext";
@@ -24,7 +24,7 @@ export default function IDLayout () {
             </View>
             <View style = {{ flex: 1 }}>
               <Section title = { `Transaction: ${user.id} - ${user.name}` } height = "100%">
-                <List/>
+                <Transaction/>
               </Section>
             </View>
           </View>

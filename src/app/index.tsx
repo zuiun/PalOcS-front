@@ -7,7 +7,6 @@ import Section from "@/components/Section";
 import UserContext from "@/contexts/UserContext";
 import { colourSpecial } from "@/utils/globals";
 
-// change to login page
 export default function Index () {
   const router = useRouter ();
   const id = useRef ("");
