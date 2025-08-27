@@ -20,7 +20,7 @@ const SelectedIdxsContext = createContext<SelectedIdxs> ({
     throw new Error ("Not Implemented");
   },
 });
-const STORAGE_KEY = "selection";
+export const KEY = "selection";
 
 export function SelectedIdxsProvider ({ children }: Readonly<{ children: React.ReactNode }>) {
   const [isInit, setInit] = useState (false);
@@ -34,7 +34,7 @@ export function SelectedIdxsProvider ({ children }: Readonly<{ children: React.R
     try {
       const store = JSON.stringify (selectedIdxsNew);
 
-      await AsyncStorage.setItem (STORAGE_KEY, store);
+      await AsyncStorage.setItem (KEY, store);
     } catch (error) {
       console.log (`Storage Error: ${error}`)
     }
@@ -47,7 +47,7 @@ export function SelectedIdxsProvider ({ children }: Readonly<{ children: React.R
     try {
       const store = JSON.stringify (selectedIdxsNew);
 
-      await AsyncStorage.setItem (STORAGE_KEY, store);
+      await AsyncStorage.setItem (KEY, store);
     } catch (error) {
       console.log (`Storage Error: ${error}`)
     }
@@ -60,7 +60,7 @@ export function SelectedIdxsProvider ({ children }: Readonly<{ children: React.R
     try {
       const store = JSON.stringify (selectedIdxsNew);
 
-      await AsyncStorage.setItem (STORAGE_KEY, store);
+      await AsyncStorage.setItem (KEY, store);
     } catch (error) {
       console.log (`Storage Error: ${error}`)
     }
@@ -69,7 +69,7 @@ export function SelectedIdxsProvider ({ children }: Readonly<{ children: React.R
   useEffect (() => {
     const getItem = async () => {
       try {
-        const resultJson = await AsyncStorage.getItem (STORAGE_KEY);
+        const resultJson = await AsyncStorage.getItem (KEY);
 
         if (resultJson) {
           const result: number[] = JSON.parse (resultJson);

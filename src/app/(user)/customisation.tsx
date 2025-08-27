@@ -8,29 +8,21 @@ import { Category, Product } from "@/utils/types";
 
 export default function Customisation () {
   const getCategories = async () => {
-    try {
-      const response = await fetch (`${process.env.EXPO_PUBLIC_API_URL}/customisation/categories`);
+    const response = await fetch (`${process.env.EXPO_PUBLIC_API_URL}/customisation/categories`);
 
-      if (response.ok) {
-        return await response.json ();
-      } else {
-        throw new Error (`Fetch Error: ${response.status}`);
-      }
-    } catch (error) {
-      console.log (error);
+    if (response.ok) {
+      return await response.json ();
+    } else {
+      throw new Error (`${response.status}`);
     }
   };
   const getCustomisations = async () => {
-    try {
-      const response = await fetch (`${process.env.EXPO_PUBLIC_API_URL}/customisation`);
+    const response = await fetch (`${process.env.EXPO_PUBLIC_API_URL}/customisation`);
 
-      if (response.ok) {
-        return await response.json ();
-      } else {
-        throw new Error (`Fetch Error: ${response.status}`);
-      }
-    } catch (error) {
-      console.log (error);
+    if (response.ok) {
+      return await response.json ();
+    } else {
+      throw new Error (`${response.status}`);
     }
   };
   const categories = useQuery ({ queryKey: [`/customisation/categories`], queryFn: getCategories });

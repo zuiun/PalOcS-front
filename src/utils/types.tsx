@@ -36,12 +36,17 @@ export interface Item {
     product_name: string,
     price: number,
     discount_name?: string,
-    discount_value?: string,
+    discount_value?: number,
 }
 
-export interface Transaction {
+export interface Report {
     id: number,
     user_id: string,
     payment: string,
     purchases: Item[],
+}
+
+export interface Status {
+  isError: boolean,
+  isSuccess: boolean,
 }

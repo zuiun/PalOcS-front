@@ -1,66 +1,78 @@
-import { useContext, useState } from "react";
-import { Dimensions, FlatList, Pressable, StyleSheet, View } from "react-native";
+import { useContext } from "react";
+import { Dimensions, FlatList, Pressable, StyleProp, StyleSheet, View, ViewStyle } from "react-native";
 import Paragraph from "@/components/Paragraph";
-import TransactionsContext from "@/contexts/TransactionsContext";
 import SelectedIdxsContext from "@/contexts/SelectedIdxsContext";
+import { calculatePrice, convertPrice } from "@/utils/helpers";
+import { Item } from "@/utils/types";
 
-function convertPrice (price: number) {
-  const dollars = Math.floor (price / 1_00);
-  const cents = price % 1_00;
-  const centsPadded = `${cents}`.padStart (2, "0");
-
-  return `$${dollars},${centsPadded}`;
+function Separator () {
+  return <View style = { styles.separator }/>;
 }
 
-function calculatePrice (price: number, discount?: number) {
-  if (discount) {
-    let priceNew = price;
+function Line ({ product_name, discount_name, discount_value, price, style, onPress }: Readonly<{ product_name: string, discount_name?: string, discount_value?: number, price: number, style?: StyleProp<ViewStyle>, onPress?: () => undefined }>) {
+  let row = (
+    <>
+      <Paragraph style = {[ styles.name, { flex: 3} ]}>
+        { product_name }
+      </Paragraph>
+      { (discount_name && discount_value) && <Paragraph style = {[ styles.discount, { flex: 3} ]}>
+        {discount_name} -{ discount_value }%
+      </Paragraph> }
+      <Paragraph style = {[ styles.price, { flex: 1} ]}>
+        { convertPrice (price) }
+      </Paragraph>
+    </>
+  );
 
-    priceNew *= (100 - discount) / 100;
-    priceNew = Math.ceil (priceNew);
-    return priceNew;
+  if (onPress) {
+    return (
+      <View style = { style }>
+        <Pressable style = { styles.row } onPress = { onPress }>
+          { row }
+        </Pressable>
+      </View>
+    );
   } else {
-    return price;
+    return (
+      <View style = {[ styles.row, style ]}>
+        { row }
+      </View>
+    );
   }
 }
 
-export default function Transaction () {
-  const transactions = useContext (TransactionsContext);
+export default function Transaction ({ purchases, isSelectable }: Readonly<{ purchases: Item[], isSelectable: boolean }>) {
   const selectedIdxs = useContext (SelectedIdxsContext);
   let priceTotal: number = 0;
 
-  transactions.purchases.forEach ((p) => priceTotal += calculatePrice (p.price, p.discount?.value));
+  purchases.forEach ((p) => priceTotal += calculatePrice (p.price, p.discount_value));
 
   return (
     <>
-      <FlatList contentContainerStyle = {[ styles.list ]} data = { transactions.purchases }
-          keyExtractor = { (item, index) => `${item.id}-${item.category_id}-${index}` }
+      <FlatList contentContainerStyle = {[ styles.list ]} data = { purchases }
+          ItemSeparatorComponent = { Separator }
+          keyExtractor = { (item, index) => `${item.product_name}-${index}` }
           renderItem = { ({item, index}) => {
-        let price = calculatePrice (item.price, item.discount?.value);
+        let price = calculatePrice (item.price, item.discount_value);
 
         return (
-          <View key = { index } style = {[ styles.item, selectedIdxs.selectedIdxs.includes (index) && styles.selected ]}>
-            <Pressable style = { styles.container } onPress = { () => {
-              if (selectedIdxs.selectedIdxs.includes (index)) {
-                selectedIdxs.remove (index);
-              } else {
-                selectedIdxs.add (index);
+          <Line key = { index } product_name = { item.product_name } discount_name = { item.discount_name } discount_value = { item.discount_value } price = { price }
+              style = { selectedIdxs.selectedIdxs.includes (index) && styles.selected }
+              onPress = { isSelectable ? 
+                () => {
+                  if (selectedIdxs.selectedIdxs.includes (index)) {
+                    selectedIdxs.remove (index);
+                  } else {
+                    selectedIdxs.add (index);
+                  }
+                }
+              :
+                undefined
               }
-            } }>
-              <Paragraph style = {[ styles.name, { flex: 3} ]}>
-                { item.name }
-              </Paragraph>
-              { item.discount && <Paragraph style = {[ styles.discount, { flex: 3} ]}>
-                {item.discount.name} -{ item.discount.value }%
-              </Paragraph> }
-              <Paragraph style = {[ styles.price, { flex: 1} ]}>
-                { convertPrice (price) }
-              </Paragraph>
-            </Pressable>
-          </View>
+          />
         );
       } }/>
-      <View style = {[ styles.item, styles.total, styles.container ]}>
+      <View style = {[ styles.total, styles.row ]}>
         <Paragraph style = {[ styles.name, { flex: 4} ]}>
           Total
         </Paragraph>
@@ -81,18 +93,20 @@ const styles = StyleSheet.create ({
     borderColor: "#fff",
     borderWidth: 1,
   },
-  item: {
-    borderColor: "#fff",
-    borderBottomWidth: 1,
+  separator: {
+    height: 1,
+    backgroundColor: "#fff",
   },
   total: {
     alignItems: "center",
+    borderColor: "#fff",
     borderLeftWidth: 1,
     borderRightWidth: 1,
+    borderBottomWidth: 1,
     paddingTop: 0.01 * Dimensions.get ("window").height,
     paddingBottom: 0.01 * Dimensions.get ("window").height,
   },
-  container: {
+  row: {
     flexDirection: "row",
   },
   selected: {

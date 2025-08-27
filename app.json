@@ -3,7 +3,7 @@
     "name": "PalOcS",
     "slug": "PalOcS",
     "version": "1.0.0",
-    "orientation": "portrait",
+    "orientation": "landscape",
     "icon": "./assets/images/icon.png",
     "scheme": "palocs",
     "userInterfaceStyle": "automatic",

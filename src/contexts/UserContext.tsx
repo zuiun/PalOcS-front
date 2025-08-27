@@ -1,16 +1,13 @@
 import { createContext, useEffect, useState } from "react";
 import AsyncStorage from "@react-native-async-storage/async-storage";
 import { queryClient } from "@/app/_layout";
+import { Status } from "@/utils/types";
 
-interface Response {
-  isError: boolean,
-  isSuccess: boolean,
-}
-
+// TODO: write a validate()
 interface User {
   id: string,
   name: string,
-  login: (id: string) => Promise<Response>,
+  login: (id: string) => Promise<Status>,
   logout: () => void,
 }
 
@@ -30,7 +27,7 @@ const UserContext = createContext<User> ({
     throw new Error ("Not Implemented");
   },
 });
-const STORAGE_KEY = "user";
+export const KEY = "user";
 
 export function UserProvider ({ children }: Readonly<{ children: React.ReactNode }>) {
   const [isInit, setInit] = useState (false);
@@ -38,24 +35,20 @@ export function UserProvider ({ children }: Readonly<{ children: React.ReactNode
   const [name, setName] = useState ("");
   const login = async (id: string) => {
     const postSession = async () => {
-      try {
-        const response = await fetch (`${process.env.EXPO_PUBLIC_API_URL}/session`, {
-          method: "POST",
-          headers: {
-            "Content-Type": "application/json",
-          },
-          body: JSON.stringify ({
-            id: id,
-          }),
-        });
+      const response = await fetch (`${process.env.EXPO_PUBLIC_API_URL}/session`, {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json",
+        },
+        body: JSON.stringify ({
+          id: id,
+        }),
+      });
 
-        if (response.ok) {
-          return await response.json ();
-        } else {
-          throw new Error (`Fetch Error: ${response.status}`);
-        }
-      } catch (error) {
-        console.log (error);
+      if (response.ok) {
+        return await response.json ();
+      } else {
+        throw new Error (`${response.status}`);
       }
     };
     let name: string;
@@ -79,7 +72,7 @@ export function UserProvider ({ children }: Readonly<{ children: React.ReactNode
     try {
       const store = JSON.stringify ({ id: id, name: name });
 
-      await AsyncStorage.setItem (STORAGE_KEY, store);
+      await AsyncStorage.setItem (KEY, store);
     } catch (error) {
       console.log (`Storage Error: ${error}`)
       return { isError: true, isSuccess: false };
@@ -94,7 +87,7 @@ export function UserProvider ({ children }: Readonly<{ children: React.ReactNode
     setName (user.name);
 
     try {
-      await AsyncStorage.removeItem (STORAGE_KEY);
+      await AsyncStorage.removeItem (KEY);
     } catch (error) {
       console.log (`Storage Error: ${error}`)
     }
@@ -103,7 +96,7 @@ export function UserProvider ({ children }: Readonly<{ children: React.ReactNode
   useEffect (() => {
     const getItem = async () => {
       try {
-        const resultJson = await AsyncStorage.getItem (STORAGE_KEY);
+        const resultJson = await AsyncStorage.getItem (KEY);
 
         if (resultJson) {
           const result: { id: string, name: string } = JSON.parse (resultJson);

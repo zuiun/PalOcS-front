@@ -21,6 +21,7 @@ const styles = StyleSheet.create ({
   title: {
     textAlign: "center",
     marginTop: 0.01 * Dimensions.get ("window").height,
+    fontSize: 0.02 * Dimensions.get ("window").height,
   },
   contents: {
     width: "100%",

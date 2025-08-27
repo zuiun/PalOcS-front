@@ -12,29 +12,21 @@ import { Category, Drink } from "@/utils/types";
 export default function Drinks () {  
   const { drink }: { drink: string } = useLocalSearchParams ();
   const getCategories = async () => {
-    try {
-      const response = await fetch (`${process.env.EXPO_PUBLIC_API_URL}/drink/${drink}/categories`);
+    const response = await fetch (`${process.env.EXPO_PUBLIC_API_URL}/drink/${drink}/categories`);
 
-      if (response.ok) {
-        return await response.json ();
-      } else {
-        throw new Error (`Fetch Error: ${response.status}`);
-      }
-    } catch (error) {
-      console.log (error);
+    if (response.ok) {
+      return await response.json ();
+    } else {
+      throw new Error (`${response.status}`);
     }
   };
   const getDrinks = async () => {
-    try {
-      const response = await fetch (`${process.env.EXPO_PUBLIC_API_URL}/drink/${drink}`);
+    const response = await fetch (`${process.env.EXPO_PUBLIC_API_URL}/drink/${drink}`);
 
-      if (response.ok) {
-        return await response.json ();
-      } else {
-        throw new Error (`Fetch Error: ${response.status}`);
-      }
-    } catch (error) {
-      console.log (error);
+    if (response.ok) {
+      return await response.json ();
+    } else {
+      throw new Error (`${response.status}`);
     }
   };
   const [sizeIdx, setSizeIdx] = useState (uninitialisedIdx);
