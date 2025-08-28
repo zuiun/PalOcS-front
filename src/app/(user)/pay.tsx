@@ -2,14 +2,15 @@ import { useRouter } from "expo-router";
 import { useContext, useState } from "react";
 import { useMutation, useQuery } from "@tanstack/react-query";
 import Grid, { Panel } from "@/components/Grid";
+import Indicator from "@/components/Indicator";
 import Popup from "@/components/Popup";
-import Reprint from "@/components/Reprint";
+import Receipt from "@/components/Receipt";
 import Section from "@/components/Section";
 import Query from "@/components/Query";
 import SelectedIdxsContext from "@/contexts/SelectedIdxsContext";
-import TransactionsContext from "@/contexts/TransactionsContext";
+import TransactionContext from "@/contexts/TransactionContext";
 import UserContext from "@/contexts/UserContext";
-import { Discount, Report } from "@/utils/types";
+import { DiscountAPI, ReceiptAPI } from "@/utils/types";
 
 export default function Pay () {
   const router = useRouter ();
@@ -24,7 +25,7 @@ export default function Pay () {
   };
   const discounts = useQuery ({ queryKey: [`/discount`], queryFn: getDiscounts });
   const user = useContext (UserContext);
-  const transactions = useContext (TransactionsContext);
+  const transactions = useContext (TransactionContext);
   const selectedIdxs = useContext (SelectedIdxsContext);
   const postTransaction = useMutation ({
     mutationFn: async (payment: string) => {
@@ -49,25 +50,30 @@ export default function Pay () {
   });
   const handlePress = async (payment: string) => {
     if (transactions.purchases.length > 0) {
+      setVisibleIndicator (true);
+
       try {
         const result = await postTransaction.mutateAsync (payment);
         const id: number = result.id;
         const timestamp: string = result.timestamp;
 
-        setReport ({
+        setReceipt ({
           id: id,
+          timestamp: timestamp,
           user_id: user.id,
+          user_name: user.name,
           payment: payment,
-          purchases: transactions.purchases.map ((p) => {
+          lines: transactions.purchases.map ((p) => {
             return {
-              product_name: p.name,
+              name: p.name,
               price: p.price,
               discount_name: p.discount?.name,
               discount_value: p.discount?.value,
             }
           }),
         });
-        setVisible (true);
+        setVisibleIndicator (false);
+        setVisibleReceipt (true);
       } catch (error) {
         console.log (error);
       }
@@ -76,21 +82,26 @@ export default function Pay () {
       selectedIdxs.clear ();
     }
   };
-  const [isVisible, setVisible] = useState (false);
-  const [report, setReport] = useState<Report> ({
+  const [isVisibleIndicator, setVisibleIndicator] = useState (false);
+  const [isVisibleReceipt, setVisibleReceipt] = useState (false);
+  const [receipt, setReceipt] = useState<ReceiptAPI> ({
     id: 0,
+    timestamp: "",
     user_id: "",
+    user_name: "",
+    lines: [],
     payment: "",
-    purchases: [],
   });
 
   return (
     <>
-      <Popup visible = { isVisible } onPress = { () => {
-        setVisible (false);
+      <Popup visible = { isVisibleIndicator || isVisibleReceipt } onPress = { () => {
+        setVisibleIndicator (false);
+        setVisibleReceipt (false);
         router.replace ("/drink");
       } }>
-        <Reprint report = { report }/>
+        { isVisibleIndicator && <Indicator isLarge = { true }/> }
+        { isVisibleReceipt && <Receipt receipt = { receipt }/>}
       </Popup>
       <Section title = "Pay">
         <Grid align = { 3 }>
@@ -104,7 +115,7 @@ export default function Pay () {
         <Query result = { discounts }>
           <Grid align = { 4 }>
             {
-              discounts.data?.map ((d: Discount) =>
+              discounts.data?.map ((d: DiscountAPI) =>
                 <Panel key = { d.id } title = { d.name } onPress = { () => {
                   selectedIdxs.selectedIdxs.forEach ((i) => transactions.setDiscount (i, d));
                   selectedIdxs.clear ();

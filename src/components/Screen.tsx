@@ -4,11 +4,11 @@ import Footer from "@/components/Footer";
 import Section from "@/components/Section";
 import Transaction from "@/components/Transaction";
 import UserContext from "@/contexts/UserContext";
-import TransactionsContext from "@/contexts/TransactionsContext";
+import TransactionContext from "@/contexts/TransactionContext";
 
 export default function Screen ({ children }: Readonly<{ children: React.ReactNode }>) {
   const user = useContext (UserContext);
-  const transactions = useContext (TransactionsContext);
+  const transactions = useContext (TransactionContext);
 
   return (
     <View style = {[ styles.screen, styles.row ]}>
@@ -22,7 +22,7 @@ export default function Screen ({ children }: Readonly<{ children: React.ReactNo
         <Section title = { `${user.id} - ${user.name}` } height = "100%">
           <Transaction purchases = { transactions.purchases.map ((p) => {
             return {
-              product_name: p.name,
+              name: p.name,
               price: p.price,
               discount_name: p.discount?.name,
               discount_value: p.discount?.value,

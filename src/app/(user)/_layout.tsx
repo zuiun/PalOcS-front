@@ -2,10 +2,10 @@ import { Redirect, Slot } from "expo-router";
 import { useContext } from "react";
 import Screen from "@/components/Screen";
 import { SelectedIdxsProvider } from "@/contexts/SelectedIdxsContext";
-import { TransactionsProvider } from "@/contexts/TransactionsContext";
+import { TransactionsProvider } from "@/contexts/TransactionContext";
 import UserContext from "@/contexts/UserContext";
 
-export default function IDLayout () {
+export default function UserLayout () {
   const user = useContext (UserContext);
 
   return (

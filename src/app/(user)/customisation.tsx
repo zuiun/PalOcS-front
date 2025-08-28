@@ -3,12 +3,14 @@ import { useQuery } from "@tanstack/react-query";
 import Grid, { Panel } from "@/components/Grid";
 import Section from "@/components/Section";
 import Query from "@/components/Query";
-import TransactionsContext from "@/contexts/TransactionsContext";
-import { Category, Product } from "@/utils/types";
+import TransactionContext from "@/contexts/TransactionContext";
+import { ProductAPI, SubcategoryAPI } from "@/utils/types";
+
+const CATEGORY_ID = 5;
 
 export default function Customisation () {
-  const getCategories = async () => {
-    const response = await fetch (`${process.env.EXPO_PUBLIC_API_URL}/customisation/categories`);
+  const getSubcategories = async () => {
+    const response = await fetch (`${process.env.EXPO_PUBLIC_API_URL}/product/${CATEGORY_ID}/subcategories`);
 
     if (response.ok) {
       return await response.json ();
@@ -17,7 +19,7 @@ export default function Customisation () {
     }
   };
   const getCustomisations = async () => {
-    const response = await fetch (`${process.env.EXPO_PUBLIC_API_URL}/customisation`);
+    const response = await fetch (`${process.env.EXPO_PUBLIC_API_URL}/product/${CATEGORY_ID}`);
 
     if (response.ok) {
       return await response.json ();
@@ -25,28 +27,26 @@ export default function Customisation () {
       throw new Error (`${response.status}`);
     }
   };
-  const categories = useQuery ({ queryKey: [`/customisation/categories`], queryFn: getCategories });
-  const customisations = useQuery ({ queryKey: [`/customisation`], queryFn: getCustomisations });
-  const transactions = useContext (TransactionsContext);
+  const subcategories = useQuery ({ queryKey: [`/product/${CATEGORY_ID}/subcategories`], queryFn: getSubcategories });
+  const customisations = useQuery ({ queryKey: [`/product/${CATEGORY_ID}`], queryFn: getCustomisations });
+  const transactions = useContext (TransactionContext);
 
   return (
     <>
-      <Query result = { categories }>
+      <Query result = { subcategories }>
         <Query result = { customisations }>
           {
-            categories.data?.map ((ca: Category) =>
-              <Section key = { ca.id } title = { ca.name }>
+            subcategories.data?.map ((s: SubcategoryAPI) =>
+              <Section key = { s.id } title = { s.name }>
                 <Grid align = { 8 }>
                   {
-                    customisations.data?.filter ((cu: Product) => cu.category_id === ca.id)
-                        .map ((cu: Product) =>
-                          <Panel key = { cu.id } title = { cu.name } onPress = { () =>
+                    customisations.data?.filter ((c: ProductAPI) => c.subcategory_id === s.id)
+                        .map ((c: ProductAPI) =>
+                          <Panel key = { c.id } title = { c.name } onPress = { () =>
                             transactions.add ({
-                              id: cu.id,
-                              type: "customisations",
-                              category_id: cu.category_id,
-                              name: cu.name,
-                              price: cu.price,
+                              id: c.id,
+                              name: c.name,
+                              price: c.price[0],
                           })}/>
                         )
                   }

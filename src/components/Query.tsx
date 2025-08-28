@@ -1,5 +1,6 @@
 import { UseQueryResult } from "@tanstack/react-query";
-import { ActivityIndicator, StyleSheet, View } from "react-native";
+import { StyleSheet, View } from "react-native";
+import Indicator from "@/components/Indicator";
 import Paragraph from "@/components/Paragraph";
 
 export default function Query ({ children, result }: Readonly<{ children: React.ReactNode, result: UseQueryResult }>) {
@@ -14,7 +15,7 @@ export default function Query ({ children, result }: Readonly<{ children: React.
       </View>
     );
   } else if (result.isPending) {
-    return <ActivityIndicator/>;
+    return <Indicator/>;
   } else {
     return (
       <>

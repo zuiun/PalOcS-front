@@ -4,24 +4,26 @@ import { queryClient } from "@/app/_layout";
 import Grid, { Panel } from "@/components/Grid";
 import Input from "@/components/Input";
 import Popup from "@/components/Popup";
-import Reprint from "@/components/Reprint";
+import Receipt from "@/components/Receipt";
 import SelectedIdxsContext from "@/contexts/SelectedIdxsContext";
-import TransactionsContext from "@/contexts/TransactionsContext";
+import TransactionContext from "@/contexts/TransactionContext";
 import UserContext from "@/contexts/UserContext";
 import { colourSpecial, colourTab } from "@/utils/globals";
-import { Report } from "@/utils/types";
+import { ReceiptAPI } from "@/utils/types";
 
 export default function Footer ({ flex }: Readonly<{ flex: number }>) {
   const user = useContext (UserContext);
-  const transactions = useContext (TransactionsContext);
+  const transactions = useContext (TransactionContext);
   const selectedIdxs = useContext (SelectedIdxsContext);
   const [isVisibleInput, setVisibleInput] = useState (false);
   const [isVisibleTransaction, setVisibleTransaction] = useState (false);
-  const [report, setReport] = useState<Report> ({
+  const [receipt, setReceipt] = useState<ReceiptAPI> ({
     id: 0,
+    timestamp: "",
     user_id: "",
+    user_name: "",
+    lines: [],
     payment: "",
-    purchases: [],
   });
   const handlePress = async (id: string) => {
     const getTransaction = async () => {
@@ -35,10 +37,10 @@ export default function Footer ({ flex }: Readonly<{ flex: number }>) {
         throw new Error (`${response.status}`);
       }
     };
-    let report: Report;
+    let receiptNew: ReceiptAPI;
 
     try {
-      report = await queryClient.fetchQuery ({ queryKey: [`/transaction/${id}`], queryFn: getTransaction });
+      receiptNew = await queryClient.fetchQuery ({ queryKey: [`/transaction/${id}`], queryFn: getTransaction });
     } catch (error) {
       console.log (`Fetch Error: ${error}`);
 
@@ -49,7 +51,7 @@ export default function Footer ({ flex }: Readonly<{ flex: number }>) {
       }
     }
 
-    setReport (report);
+    setReceipt (receiptNew);
     return { isError: false, isSuccess: true };
   };
 
@@ -68,7 +70,7 @@ export default function Footer ({ flex }: Readonly<{ flex: number }>) {
               }
           }/>
         </View> }
-        { isVisibleTransaction && <Reprint report = { report }/> }
+        { isVisibleTransaction && <Receipt receipt = { receipt }/> }
       </Popup>
       <View style = {[ styles.row, { flex: flex } ]}>
         <Grid align = { 2 }>

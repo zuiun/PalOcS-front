@@ -1,23 +1,16 @@
-export interface Category {
+export interface SubcategoryAPI {
   id: number,
   name: string,
 }
 
-export interface Product {
+export interface ProductAPI {
   id: number,
-  category_id: number,
-  name: string,
-  price: number,
-}
-
-export interface Drink {
-  id: number,
-  category_id: number,
+  subcategory_id: number,
   name: string,
   price: number[],
 }
 
-export interface Discount {
+export interface DiscountAPI {
   id: number,
   name: string,
   value: number,
@@ -25,25 +18,31 @@ export interface Discount {
 
 export interface Purchase {
   id: number,
-  type: string,
-  category_id: number,
   name: string,
   price: number,
-  discount?: Discount,
+  discount?: DiscountAPI,
 }
 
-export interface Item {
-    product_name: string,
+export interface PurchaseAPI {
+  id: number,
+  price: number,
+  discount_id?: number,
+}
+
+export interface LineAPI {
+    name: string,
     price: number,
     discount_name?: string,
     discount_value?: number,
 }
 
-export interface Report {
+export interface ReceiptAPI {
     id: number,
+    timestamp: string,
     user_id: string,
+    user_name: string,
+    lines: LineAPI[],
     payment: string,
-    purchases: Item[],
 }
 
 export interface Status {

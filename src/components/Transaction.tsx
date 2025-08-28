@@ -3,22 +3,23 @@ import { Dimensions, FlatList, Pressable, StyleProp, StyleSheet, View, ViewStyle
 import Paragraph from "@/components/Paragraph";
 import SelectedIdxsContext from "@/contexts/SelectedIdxsContext";
 import { calculatePrice, convertPrice } from "@/utils/helpers";
-import { Item } from "@/utils/types";
+import { LineAPI } from "@/utils/types";
 
 function Separator () {
   return <View style = { styles.separator }/>;
 }
 
-function Line ({ product_name, discount_name, discount_value, price, style, onPress }: Readonly<{ product_name: string, discount_name?: string, discount_value?: number, price: number, style?: StyleProp<ViewStyle>, onPress?: () => undefined }>) {
+function Line ({ line, style, onPress }: Readonly<{ line: LineAPI, style?: StyleProp<ViewStyle>, onPress?: () => undefined }>) {
+  const price = calculatePrice (line.price, line.discount_value);
   let row = (
     <>
-      <Paragraph style = {[ styles.name, { flex: 3} ]}>
-        { product_name }
+      <Paragraph style = {[ styles.left, { flex: 3} ]}>
+        { line.name }
       </Paragraph>
-      { (discount_name && discount_value) && <Paragraph style = {[ styles.discount, { flex: 3} ]}>
-        {discount_name} -{ discount_value }%
+      { (line.discount_name && line.discount_value) && <Paragraph style = {[ styles.centre, { flex: 3} ]}>
+        { line.discount_name } -{ line.discount_value }%
       </Paragraph> }
-      <Paragraph style = {[ styles.price, { flex: 1} ]}>
+      <Paragraph style = {[ styles.right, { flex: 1} ]}>
         { convertPrice (price) }
       </Paragraph>
     </>
@@ -41,7 +42,7 @@ function Line ({ product_name, discount_name, discount_value, price, style, onPr
   }
 }
 
-export default function Transaction ({ purchases, isSelectable }: Readonly<{ purchases: Item[], isSelectable: boolean }>) {
+export default function Transaction ({ purchases, isSelectable, payment }: Readonly<{ purchases: LineAPI[], isSelectable: boolean, payment?: string }>) {
   const selectedIdxs = useContext (SelectedIdxsContext);
   let priceTotal: number = 0;
 
@@ -51,13 +52,11 @@ export default function Transaction ({ purchases, isSelectable }: Readonly<{ pur
     <>
       <FlatList contentContainerStyle = {[ styles.list ]} data = { purchases }
           ItemSeparatorComponent = { Separator }
-          keyExtractor = { (item, index) => `${item.product_name}-${index}` }
+          keyExtractor = { (item, index) => `${item.name}-${index}` }
           renderItem = { ({item, index}) => {
-        let price = calculatePrice (item.price, item.discount_value);
-
         return (
-          <Line key = { index } product_name = { item.product_name } discount_name = { item.discount_name } discount_value = { item.discount_value } price = { price }
-              style = { selectedIdxs.selectedIdxs.includes (index) && styles.selected }
+          <Line key = { index } line = { item }
+              style = {[ styles.item, isSelectable && selectedIdxs.selectedIdxs.includes (index) && styles.selected ]}
               onPress = { isSelectable ? 
                 () => {
                   if (selectedIdxs.selectedIdxs.includes (index)) {
@@ -72,13 +71,18 @@ export default function Transaction ({ purchases, isSelectable }: Readonly<{ pur
           />
         );
       } }/>
-      <View style = {[ styles.total, styles.row ]}>
-        <Paragraph style = {[ styles.name, { flex: 4} ]}>
-          Total
-        </Paragraph>
-        <Paragraph style = {[ styles.price, { flex: 1} ]}>
-          { convertPrice (priceTotal) }
-        </Paragraph>
+      <View style = { styles.total }>
+        <View style = { styles.row }>
+          <Paragraph style = {[ styles.left, { flex: 4} ]}>
+            Total
+          </Paragraph>
+          <Paragraph style = {[ styles.right, { flex: 1} ]}>
+            { convertPrice (priceTotal) }
+          </Paragraph>
+        </View>
+        { payment && <Paragraph>
+          Paid with { payment }
+        </Paragraph> }
       </View>
     </>
   );
@@ -107,20 +111,25 @@ const styles = StyleSheet.create ({
     paddingBottom: 0.01 * Dimensions.get ("window").height,
   },
   row: {
+    width: "100%",
     flexDirection: "row",
   },
   selected: {
     backgroundColor: "blue",
   },
-  name: {
+  left: {
     paddingLeft: 0.01 * Dimensions.get ("window").height,
   },
-  discount: {
+  centre: {
     color: "red",
     textAlign: "right",
   },
-  price: {
+  right: {
     paddingRight: 0.01 * Dimensions.get ("window").height,
     textAlign: "right",
   },
+  item: {
+    paddingTop: 0.003 * Dimensions.get ("window").height,
+    paddingBottom: 0.003 * Dimensions.get ("window").height,
+  }
 });

@@ -1,6 +1,7 @@
 import { useRef, useState } from "react";
-import { ActivityIndicator, Dimensions, StyleSheet, TextInput, View } from "react-native";
+import { Dimensions, StyleSheet, TextInput, View } from "react-native";
 import Grid, { Panel } from "@/components/Grid";
+import Indicator from "@/components/Indicator";
 import Paragraph from "@/components/Paragraph";
 import Section from "@/components/Section";
 import { colourSpecial } from "@/utils/globals";
@@ -41,7 +42,7 @@ export default function Input ({ title, onPress, onSuccess }: Readonly<{ title: 
       </Grid>
       <View style = { styles.response }>
         { isError && <Paragraph style = { styles.error }>Error, try again later</Paragraph> }
-        { isPending && <ActivityIndicator/> }
+        { isPending && <Indicator/> }
         { isFailure && <Paragraph style = { styles.error }>Invalid input</Paragraph> }
       </View>
     </View>

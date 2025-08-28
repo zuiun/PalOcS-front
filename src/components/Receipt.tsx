@@ -2,20 +2,24 @@ import { Dimensions, StyleSheet, View } from "react-native";
 import Paragraph from "@/components/Paragraph";
 import Section from "@/components/Section";
 import Transaction from "@/components/Transaction";
-import { Report } from "@/utils/types";
+import { ReceiptAPI } from "@/utils/types";
 
-export default function Reprint ({ report }: Readonly<{ report: Report }>) {
+export default function Receipt ({ receipt }: Readonly<{ receipt: ReceiptAPI }>) {
   return (
     <View style = { styles.transaction }>
       <View style = { styles.title }>
-        <Section title = { `Transaction: ${report.id}` }>
-          <Paragraph style = {{ textAlign: "center", textAlignVertical: "center" }}>
-            {/* TODO: name and time */}
-            { `${report.user_id} - ${report.user_id}` }
-          </Paragraph>
+        <Section title = { `Transaction: ${receipt.id}` }>
+          <View style = { styles.row }>
+            <Paragraph style = {[ styles.text, styles.left, { flex: 1 } ]}>
+            { `${receipt.user_id} - ${receipt.user_name}` }
+            </Paragraph>
+            <Paragraph style = {[ styles.text, styles.right, { flex: 1 } ]}>
+              { receipt.timestamp } CET
+            </Paragraph>
+          </View>
         </Section>
       </View>
-      <Transaction purchases = { report.purchases } isSelectable = { false }/>
+      <Transaction purchases = { receipt.lines } isSelectable = { false } payment = { receipt.payment }/>
     </View>
   );
 }
@@ -39,9 +43,20 @@ const styles = StyleSheet.create ({
     borderRightWidth: 1,
     borderLeftWidth: 1,
   },
+  text: {
+    textAlign: "center",
+    textAlignVertical: "center",
+  },
   row: {
     width: "100%",
     flexDirection: "row",
     justifyContent: "space-evenly",
+  },
+  left: {
+    paddingLeft: 0.01 * Dimensions.get ("window").height,
+  },
+  right: {
+    paddingRight: 0.01 * Dimensions.get ("window").height,
+    textAlign: "right",
   },
 });

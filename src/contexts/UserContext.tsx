@@ -11,7 +11,7 @@ interface User {
   logout: () => void,
 }
 
-interface Authentication {
+interface AuthenticationAPI {
   ok: boolean,
   id: string,
   name: string,
@@ -54,7 +54,7 @@ export function UserProvider ({ children }: Readonly<{ children: React.ReactNode
     let name: string;
 
     try {
-      const authentication: Authentication = await queryClient.fetchQuery ({ queryKey: [`/session/${id}`], queryFn: postSession });
+      const authentication: AuthenticationAPI = await queryClient.fetchQuery ({ queryKey: [`/session/${id}`], queryFn: postSession });
 
       if (authentication.ok) {
         name = authentication.name;

@@ -5,14 +5,14 @@ import { useQuery } from "@tanstack/react-query";
 import Grid, { Panel } from "@/components/Grid";
 import Section from "@/components/Section";
 import Query from "@/components/Query";
-import TransactionsContext from "@/contexts/TransactionsContext";
+import TransactionContext from "@/contexts/TransactionContext";
 import { colourDefault, colourSelected, uninitialisedIdx } from "@/utils/globals";
-import { Category, Drink } from "@/utils/types";
+import { ProductAPI, SubcategoryAPI } from "@/utils/types";
 
-export default function Drinks () {  
-  const { drink }: { drink: string } = useLocalSearchParams ();
-  const getCategories = async () => {
-    const response = await fetch (`${process.env.EXPO_PUBLIC_API_URL}/drink/${drink}/categories`);
+export default function CategoryID () {  
+  const { category_id }: { category_id: number } = useLocalSearchParams ();
+  const getSubcategories = async () => {
+    const response = await fetch (`${process.env.EXPO_PUBLIC_API_URL}/product/${category_id}/subcategories`);
 
     if (response.ok) {
       return await response.json ();
@@ -21,7 +21,7 @@ export default function Drinks () {
     }
   };
   const getDrinks = async () => {
-    const response = await fetch (`${process.env.EXPO_PUBLIC_API_URL}/drink/${drink}`);
+    const response = await fetch (`${process.env.EXPO_PUBLIC_API_URL}/product/${category_id}`);
 
     if (response.ok) {
       return await response.json ();
@@ -30,9 +30,9 @@ export default function Drinks () {
     }
   };
   const [sizeIdx, setSizeIdx] = useState (uninitialisedIdx);
-  const categories = useQuery ({ queryKey: [`/drink/${drink}/categories`], queryFn: getCategories });
-  const drinks = useQuery ({ queryKey: [`/drink/${drink}`], queryFn: getDrinks });
-  const transactions = useContext (TransactionsContext);
+  const subcategories = useQuery ({ queryKey: [`/product/${category_id}/categories`], queryFn: getSubcategories });
+  const drinks = useQuery ({ queryKey: [`/product/${category_id}`], queryFn: getDrinks });
+  const transactions = useContext (TransactionContext);
 
   useEffect (() => {
     if (sizeIdx > uninitialisedIdx) {
@@ -53,15 +53,15 @@ export default function Drinks () {
           </Section>
         </View>
         <View style = {[ styles.container, { flex: 4 } ]}>
-          <Query result = { categories }>
+          <Query result = { subcategories }>
             <Query result = { drinks }>
               {
-                categories.data?.map ((c: Category) => 
-                  <Section key = { c.id } title = { c.name }>
+                subcategories.data?.map ((s: SubcategoryAPI) => 
+                  <Section key = { s.id } title = { s.name }>
                     <Grid align = { 6 }>
                       {
-                        drinks.data?.filter ((d: Drink) => d.category_id === c.id)
-                          .map ((d: Drink) =>
+                        drinks.data?.filter ((d: ProductAPI) => d.subcategory_id === s.id)
+                          .map ((d: ProductAPI) =>
                             <Panel key = { d.id } title = { d.name } onPress = { () => {
                               if (sizeIdx > uninitialisedIdx) {
                                 if (sizeIdx < d.price.length) {
@@ -81,8 +81,6 @@ export default function Drinks () {
 
                                   transactions.add ({
                                     id: d.id,
-                                    type: drink,
-                                    category_id: d.category_id,
                                     name: `${d.name} ${size}`,
                                     price: d.price[sizeIdx],
                                   });
@@ -90,8 +88,6 @@ export default function Drinks () {
                                 } else {
                                   transactions.add ({
                                     id: d.id,
-                                    type: drink,
-                                    category_id: d.category_id,
                                     name: `${d.name} (S)`,
                                     price: d.price[0],
                                   });

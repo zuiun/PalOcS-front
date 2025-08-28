@@ -1,16 +1,16 @@
 import { createContext, useEffect, useState } from "react";
 import AsyncStorage from "@react-native-async-storage/async-storage";
-import { Discount, Purchase } from "@/utils/types";
+import { DiscountAPI, Purchase } from "@/utils/types";
 
 interface Transaction {
   purchases: Purchase[],
   add: (purchase: Purchase) => void,
   remove: (idxs: number[]) => void,
   clear: () => void,
-  setDiscount: (idx: number, discount: Discount) => void,
+  setDiscount: (idx: number, discount: DiscountAPI) => void,
 }
 
-const TransactionsContext = createContext<Transaction> ({
+const TransactionContext = createContext<Transaction> ({
   purchases: [],
   add: (purchase: Purchase) => {
     throw new Error ("Not Implemented");
@@ -21,7 +21,7 @@ const TransactionsContext = createContext<Transaction> ({
   clear: () => {
     throw new Error ("Not Implemented");
   },
-  setDiscount: (idx: number, discount: Discount) => {
+  setDiscount: (idx: number, discount: DiscountAPI) => {
     throw new Error ("Not Implemented");
   },
 });
@@ -29,15 +29,15 @@ export const KEY = "transaction";
 
 export function TransactionsProvider ({ children }: Readonly<{ children: React.ReactNode }>) {
   const [isInit, setInit] = useState (false);
-  const [transactions, setTransactions] = useState<Purchase[]> ([]);
+  const [purchases, setPurchases] = useState<Purchase[]> ([]);
   const add = async (purchase: Purchase) => {
-    const transactionsNew = transactions.slice ();
+    const purchasesNew = purchases.slice ();
 
-    transactionsNew.push (purchase);
-    setTransactions (transactionsNew);
+    purchasesNew.push (purchase);
+    setPurchases (purchasesNew);
 
     try {
-      const store = JSON.stringify (transactionsNew);
+      const store = JSON.stringify (purchasesNew);
 
       await AsyncStorage.setItem (KEY, store);
     } catch (error) {
@@ -45,12 +45,12 @@ export function TransactionsProvider ({ children }: Readonly<{ children: React.R
     }
   };
   const remove = async (idxs: number[]) => {
-    const transactionsNew = transactions.slice ().filter ((_, i) => !idxs.includes (i));
+    const purchasesNew = purchases.slice ().filter ((_, i) => !idxs.includes (i));
 
-    setTransactions (transactionsNew);
+    setPurchases (purchasesNew);
 
     try {
-      const store = JSON.stringify (transactionsNew);
+      const store = JSON.stringify (purchasesNew);
 
       await AsyncStorage.setItem (KEY, store);
     } catch (error) {
@@ -58,31 +58,31 @@ export function TransactionsProvider ({ children }: Readonly<{ children: React.R
     }
   };
   const clear = async () => {
-    const transactionsNew: Purchase[] = [];
+    const purchasesNew: Purchase[] = [];
 
-    setTransactions (transactionsNew);
+    setPurchases (purchasesNew);
 
     try {
-      const store = JSON.stringify (transactionsNew);
+      const store = JSON.stringify (purchasesNew);
 
       await AsyncStorage.setItem (KEY, store);
     } catch (error) {
       console.log (`Storage Error: ${error}`)
     }
   };
-  const setDiscount = async (idx: number, discount: Discount) => {
-    const transactionsNew = transactions.slice ();
+  const setDiscount = async (idx: number, discount: DiscountAPI) => {
+    const purchasesNew = purchases.slice ();
 
-    if (transactions[idx].discount && transactions[idx].discount.id === discount.id) {
-      transactionsNew[idx].discount = undefined;
+    if (purchases[idx].discount && purchases[idx].discount.id === discount.id) {
+      purchasesNew[idx].discount = undefined;
     } else {
-      transactionsNew[idx].discount = discount;
+      purchasesNew[idx].discount = discount;
     }
 
-    setTransactions (transactionsNew);
+    setPurchases (purchasesNew);
 
     try {
-      const store = JSON.stringify (transactionsNew);
+      const store = JSON.stringify (purchasesNew);
 
       await AsyncStorage.setItem (KEY, store);
     } catch (error) {
@@ -98,7 +98,7 @@ export function TransactionsProvider ({ children }: Readonly<{ children: React.R
         if (resultJson) {
           const result: Purchase[] = JSON.parse (resultJson);
 
-          setTransactions (result);
+          setPurchases (result);
         }
       } catch (error) {
         console.log (`Storage Error: ${error}`)
@@ -112,10 +112,10 @@ export function TransactionsProvider ({ children }: Readonly<{ children: React.R
   }, [isInit]);
 
   return (
-    <TransactionsContext.Provider value = {{ purchases: transactions, add, remove, clear, setDiscount }}>
+    <TransactionContext.Provider value = {{ purchases, add, remove, clear, setDiscount }}>
       { children }
-    </TransactionsContext.Provider>
+    </TransactionContext.Provider>
   );
 }
 
-export default TransactionsContext;
+export default TransactionContext;

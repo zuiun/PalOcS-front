@@ -1,3 +1,2 @@
-maybe add support for returns (requires re-architecting database)
-unify types - pretty jarring that Transaction uses Purchase but takes in Item
-reprint name and timestamp for transactions
+maybe add support for returns
+find what happened to the default assets...
