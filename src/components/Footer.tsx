@@ -8,7 +8,7 @@ import Receipt from "@/components/Receipt";
 import SelectedIdxsContext from "@/contexts/SelectedIdxsContext";
 import TransactionContext from "@/contexts/TransactionContext";
 import UserContext from "@/contexts/UserContext";
-import { colourSpecial, colourTab } from "@/utils/globals";
+import { colourSpecial, colourTab } from "@/utils/consts";
 import { ReceiptAPI } from "@/utils/types";
 
 export default function Footer ({ flex }: Readonly<{ flex: number }>) {

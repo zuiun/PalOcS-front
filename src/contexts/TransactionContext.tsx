@@ -1,6 +1,6 @@
 import { createContext, useEffect, useState } from "react";
 import AsyncStorage from "@react-native-async-storage/async-storage";
-import { DiscountAPI, Purchase } from "@/utils/types";
+import { DiscountAPI, LineAPI, Purchase } from "@/utils/types";
 
 interface Transaction {
   purchases: Purchase[],
@@ -8,6 +8,7 @@ interface Transaction {
   remove: (idxs: number[]) => void,
   clear: () => void,
   setDiscount: (idx: number, discount: DiscountAPI) => void,
+  toLines: () => LineAPI[],
 }
 
 const TransactionContext = createContext<Transaction> ({
@@ -15,7 +16,7 @@ const TransactionContext = createContext<Transaction> ({
   add: (purchase: Purchase) => {
     throw new Error ("Not Implemented");
   },
-  remove: (idxs: number[])=> {
+  remove: (idxs: number[]) => {
     throw new Error ("Not Implemented");
   },
   clear: () => {
@@ -24,10 +25,13 @@ const TransactionContext = createContext<Transaction> ({
   setDiscount: (idx: number, discount: DiscountAPI) => {
     throw new Error ("Not Implemented");
   },
+  toLines: () => {
+    throw new Error ("Not Implemented");
+  }
 });
 export const KEY = "transaction";
 
-export function TransactionsProvider ({ children }: Readonly<{ children: React.ReactNode }>) {
+export function TransactionProvider ({ children }: Readonly<{ children: React.ReactNode }>) {
   const [isInit, setInit] = useState (false);
   const [purchases, setPurchases] = useState<Purchase[]> ([]);
   const add = async (purchase: Purchase) => {
@@ -89,6 +93,19 @@ export function TransactionsProvider ({ children }: Readonly<{ children: React.R
       console.log (`Storage Error: ${error}`)
     }
   };
+  const toLines = () => {
+    const lines: LineAPI[] = purchases.map ((p) => {
+      return {
+        name: p.name,
+        size: p.size,
+        price: p.price,
+        discount_name: p.discount?.name,
+        discount_value: p.discount?.value,
+      }
+    });
+
+    return lines;
+  };
 
   useEffect (() => {
     const getItem = async () => {
@@ -112,7 +129,7 @@ export function TransactionsProvider ({ children }: Readonly<{ children: React.R
   }, [isInit]);
 
   return (
-    <TransactionContext.Provider value = {{ purchases, add, remove, clear, setDiscount }}>
+    <TransactionContext.Provider value = {{ purchases, add, remove, clear, setDiscount, toLines }}>
       { children }
     </TransactionContext.Provider>
   );

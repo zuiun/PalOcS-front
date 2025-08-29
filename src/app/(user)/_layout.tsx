@@ -4,7 +4,7 @@ import { StyleSheet, View } from "react-native";
 import Indicator from "@/components/Indicator";
 import Screen from "@/components/Screen";
 import { SelectedIdxsProvider } from "@/contexts/SelectedIdxsContext";
-import { TransactionsProvider } from "@/contexts/TransactionContext";
+import { TransactionProvider } from "@/contexts/TransactionContext";
 import UserContext from "@/contexts/UserContext";
 
 export default function UserLayout () {
@@ -34,11 +34,11 @@ export default function UserLayout () {
     isInit ?
       isValidated ?
         <SelectedIdxsProvider>
-          <TransactionsProvider>
+          <TransactionProvider>
             <Screen>
               <Slot/>
             </Screen>
-          </TransactionsProvider>
+          </TransactionProvider>
         </SelectedIdxsProvider>
       :
         <Redirect href = "/"/>

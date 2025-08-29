@@ -20,15 +20,7 @@ export default function Screen ({ children }: Readonly<{ children: React.ReactNo
       </View>
       <View style = {{ flex: 1 }}>
         <Section title = { `${user.id} - ${user.name}` } height = "100%">
-          <Transaction purchases = { transactions.purchases.map ((p) => {
-            return {
-              name: p.name,
-              size: p.size,
-              price: p.price,
-              discount_name: p.discount?.name,
-              discount_value: p.discount?.value,
-            }
-          }) } isSelectable={true}/>
+          <Transaction purchases = { transactions.toLines () } isSelectable={true}/>
         </Section>
       </View>
     </View>

@@ -1,6 +1,6 @@
 import Grid, { Panel } from "@/components/Grid";
 import Section from "@/components/Section";
-import { colourDefault } from "@/utils/globals";
+import { colourDefault } from "@/utils/consts";
 
 const CATEGORY_ID_COFFEE = 1;
 const CATEGORY_ID_TEA = 2;

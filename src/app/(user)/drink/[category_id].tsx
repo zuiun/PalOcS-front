@@ -6,7 +6,7 @@ import Grid, { Panel } from "@/components/Grid";
 import Section from "@/components/Section";
 import Query from "@/components/Query";
 import TransactionContext from "@/contexts/TransactionContext";
-import { colourDefault, colourSelected, uninitialisedIdx } from "@/utils/globals";
+import { colourDefault, colourSelected, uninitialisedIdx } from "@/utils/consts";
 import { ProductAPI, SubcategoryAPI } from "@/utils/types";
 
 export default function CategoryID () {  

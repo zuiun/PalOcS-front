@@ -12,8 +12,9 @@ import Query from "@/components/Query";
 import SelectedIdxsContext from "@/contexts/SelectedIdxsContext";
 import TransactionContext from "@/contexts/TransactionContext";
 import UserContext from "@/contexts/UserContext";
+import { colourDefault, colourSelected } from "@/utils/consts";
+import { calculateTax } from "@/utils/helpers";
 import { DiscountAPI, ReceiptAPI, RefundAPI } from "@/utils/types";
-import { colourDefault, colourSelected } from "@/utils/globals";
 
 export default function Pay () {
   const router = useRouter ();
@@ -32,6 +33,7 @@ export default function Pay () {
   const selectedIdxs = useContext (SelectedIdxsContext);
   const postTransaction = useMutation ({
     mutationFn: async (payment: string) => {
+      const tax = calculateTax (transactions.toLines ());
       const response = await fetch (`${process.env.EXPO_PUBLIC_API_URL}/transaction`, {
         method: "POST",
         headers: {
@@ -41,6 +43,7 @@ export default function Pay () {
           user_id: user.id,
           purchases: transactions.purchases,
           payment: payment,
+          tax: tax,
           is_refund: isRefund,
           manager_id: manager?.id,
         }),
@@ -61,8 +64,10 @@ export default function Pay () {
       if (isRefund) {
         const { status } = await user.validate (user.id, true);
 
+        if (status.isError) {
+          return;
         // Suspend transaction until manager completes refund
-        if (status.isError || ! status.isSuccess) {
+        } else if (! status.isSuccess) {
           setVisibleInput (true);
           setVisibleIndicator (false);
           return;
@@ -98,28 +103,17 @@ export default function Pay () {
         const result = await postTransaction.mutateAsync (payment);
         const id: number = result.id;
         const timestamp: string = result.timestamp;
-        const refund: RefundAPI | undefined = manager ?
-          {
-            manager_id: manager.id,
-            manager_name: manager.name,
-          }
-        :
-          undefined;
+        const refund: RefundAPI | undefined = manager && {
+          manager_id: manager.id,
+          manager_name: manager.name,
+        };
 
         setReceipt ({
           id: id,
           timestamp: timestamp,
           user_id: user.id,
           user_name: user.name,
-          lines: transactions.purchases.map ((p) => {
-            return {
-              name: p.name,
-              size: p.size,
-              price: p.price,
-              discount_name: p.discount?.name,
-              discount_value: p.discount?.value,
-            }
-          }),
+          lines: transactions.toLines (),
           payment: payment,
           refund: refund,
         });
@@ -138,6 +132,7 @@ export default function Pay () {
         completeTransaction (payment);
       }
     }
+  // TODO: review this dependency array
   }, [isApproved, payment, isRefund, manager]);
 
   return (

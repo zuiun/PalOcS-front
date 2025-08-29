@@ -2,36 +2,17 @@ import { useContext } from "react";
 import { Dimensions, FlatList, Pressable, StyleProp, StyleSheet, View, ViewStyle } from "react-native";
 import Paragraph from "@/components/Paragraph";
 import SelectedIdxsContext from "@/contexts/SelectedIdxsContext";
+import { calculatePrice, calculateSubtotal, calculateTax } from "@/utils/helpers";
 import { LineAPI, RefundAPI } from "@/utils/types";
 
-const TAX_RATE = 27_00;
+const CURRENCY_SYMBOL = "$";
 
-function convertPrice (price: number) {
-  const dollars = Math.floor (price / 1_00);
-  const cents = price % 1_00;
-  const centsPadded = `${cents}`.padStart (2, "0");
+function convertDecimal (number: number) {
+  const units = Math.floor (number / 1_00);
+  const decimals = number % 1_00;
+  const decimalsPadded = `${decimals}`.padStart (2, "0");
 
-  return `$${dollars},${centsPadded}`;
-}
-
-function calculatePrice (price: number, discount?: number) {
-  if (discount) {
-    let priceNew = price;
-
-    priceNew *= (100 - discount) / 100;
-    priceNew = Math.ceil (priceNew);
-    return priceNew;
-  } else {
-    return price;
-  }
-}
-
-export function calculateTax (price: number) {
-  let tax = price;
-
-  tax *= TAX_RATE / 100_00;
-  tax = Math.ceil (tax);
-  return tax;
+  return `${units},${decimalsPadded}`;
 }
 
 function convertSize (size: number) {
@@ -62,7 +43,7 @@ function Line ({ line, style, isRefund, onPress }: Readonly<{ line: LineAPI, sty
         { line.discount_name } -{ line.discount_value }%
       </Paragraph> }
       <Paragraph style = {[ styles.right, isRefund && styles.centre, { flex: 1 } ]}>
-        { isRefund && "-" }{ convertPrice (price) }
+        { isRefund && "-" }{ CURRENCY_SYMBOL }{ convertDecimal (price) }
       </Paragraph>
     </>
   );
@@ -86,12 +67,8 @@ function Line ({ line, style, isRefund, onPress }: Readonly<{ line: LineAPI, sty
 
 export default function Transaction ({ purchases, isSelectable, payment, refund }: Readonly<{ purchases: LineAPI[], isSelectable: boolean, payment?: string, refund?: RefundAPI }>) {
   const selectedIdxs = useContext (SelectedIdxsContext);
-  let priceTotal: number = 0;
-
-  purchases.forEach ((p) => priceTotal += calculatePrice (p.price[p.size], p.discount_value));
-
-  const tax = calculateTax (priceTotal);
-console.log (tax);
+  const subtotal = calculateSubtotal (purchases);
+  const tax = calculateTax (purchases);
 
   return (
     <>
@@ -120,10 +97,26 @@ console.log (tax);
       <View style = { styles.total }>
         <View style = { styles.row }>
           <Paragraph style = {[ styles.left, { flex: 4} ]}>
-            Total { refund ? "Refunded" : "Spent" }
+            Subtotal
           </Paragraph>
           <Paragraph style = {[ styles.right, refund && styles.centre, { flex: 1} ]}>
-            { refund && "-" }{ convertPrice (priceTotal) }
+            { refund && "-" }{ CURRENCY_SYMBOL }{ convertDecimal (subtotal) }
+          </Paragraph>
+        </View>
+        <View style = { styles.row }>
+          <Paragraph style = {[ styles.left, { flex: 4} ]}>
+            Tax ({ convertDecimal (parseInt (process.env.EXPO_PUBLIC_TAX_RATE!)) }%)
+          </Paragraph>
+          <Paragraph style = {[ styles.right, refund && styles.centre, { flex: 1} ]}>
+            { CURRENCY_SYMBOL }{ convertDecimal (tax) }
+          </Paragraph>
+        </View>
+        <View style = { styles.row }>
+          <Paragraph style = {[ styles.left, { flex: 4} ]}>
+            Total
+          </Paragraph>
+          <Paragraph style = {[ styles.right, refund && styles.centre, { flex: 1} ]}>
+            { refund && "-" }{ CURRENCY_SYMBOL }{ convertDecimal (subtotal + tax) }
           </Paragraph>
         </View>
         {

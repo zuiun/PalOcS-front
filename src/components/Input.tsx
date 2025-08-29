@@ -4,7 +4,7 @@ import Grid, { Panel } from "@/components/Grid";
 import Indicator from "@/components/Indicator";
 import Paragraph from "@/components/Paragraph";
 import Section from "@/components/Section";
-import { colourSpecial } from "@/utils/globals";
+import { colourSpecial } from "@/utils/consts";
 import { Status } from "@/utils/types";
 
 export default function Input ({ title, onPress, onSuccess }: Readonly<{ title: string, onPress: (id: string) => Promise<Status>, onSuccess: () => undefined }>) {
