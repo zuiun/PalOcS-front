@@ -16,7 +16,7 @@ export default function Footer ({ flex }: Readonly<{ flex: number }>) {
   const transactions = useContext (TransactionContext);
   const selectedIdxs = useContext (SelectedIdxsContext);
   const [isVisibleInput, setVisibleInput] = useState (false);
-  const [isVisibleTransaction, setVisibleTransaction] = useState (false);
+  const [isVisibleReceipt, setVisibleReceipt] = useState (false);
   const [receipt, setReceipt] = useState<ReceiptAPI> ({
     id: 0,
     timestamp: "",
@@ -57,20 +57,20 @@ export default function Footer ({ flex }: Readonly<{ flex: number }>) {
 
   return (
     <>
-      <Popup visible = { isVisibleInput || isVisibleTransaction } onPress = { () => {
+      <Popup visible = { isVisibleInput || isVisibleReceipt } onPress = { () => {
         setVisibleInput (false);
-        setVisibleTransaction (false);
+        setVisibleReceipt (false);
       } }>
         { isVisibleInput && <View style = { styles.input }>
           <Input title = "Enter transaction ID"
               onPress = { handlePress }
               onSuccess = { () => {
                 setVisibleInput (false);
-                setVisibleTransaction (true);
+                setVisibleReceipt (true);
               }
           }/>
         </View> }
-        { isVisibleTransaction && <Receipt receipt = { receipt }/> }
+        { isVisibleReceipt && <Receipt receipt = { receipt }/> }
       </Popup>
       <View style = {[ styles.row, { flex: flex } ]}>
         <Grid align = { 2 }>
@@ -83,7 +83,6 @@ export default function Footer ({ flex }: Readonly<{ flex: number }>) {
             selectedIdxs.clear ();
           } }/>
           <Panel href = "/pay" title = "Pay" colour = { colourSpecial }/>
-          {/* TODO: pull up a Very Cool ID input Modal */}
           <Panel title = "Reprint" colour = { colourSpecial } onPress = { () => setVisibleInput (true) }/>
           <Panel href = "/" title = "Exit" colour = { colourSpecial } onPress = { () => {
             user.logout ();

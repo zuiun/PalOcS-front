@@ -11,7 +11,7 @@ export default function Receipt ({ receipt }: Readonly<{ receipt: ReceiptAPI }>)
         <Section title = { `Transaction: ${receipt.id}` }>
           <View style = { styles.row }>
             <Paragraph style = {[ styles.text, styles.left, { flex: 1 } ]}>
-            { `${receipt.user_id} - ${receipt.user_name}` }
+              { `${receipt.user_id} - ${receipt.user_name}` }
             </Paragraph>
             <Paragraph style = {[ styles.text, styles.right, { flex: 1 } ]}>
               { receipt.timestamp } CET
@@ -19,7 +19,7 @@ export default function Receipt ({ receipt }: Readonly<{ receipt: ReceiptAPI }>)
           </View>
         </Section>
       </View>
-      <Transaction purchases = { receipt.lines } isSelectable = { false } payment = { receipt.payment }/>
+      <Transaction purchases = { receipt.lines } isSelectable = { false } payment = { receipt.payment } refund = { receipt.refund }/>
     </View>
   );
 }

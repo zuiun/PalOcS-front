@@ -19,7 +19,8 @@ export interface DiscountAPI {
 export interface Purchase {
   id: number,
   name: string,
-  price: number,
+  size: number,
+  price: number[],
   discount?: DiscountAPI,
 }
 
@@ -31,9 +32,15 @@ export interface PurchaseAPI {
 
 export interface LineAPI {
     name: string,
-    price: number,
+    size: number,
+    price: number[],
     discount_name?: string,
     discount_value?: number,
+}
+
+export interface RefundAPI {
+    manager_id: string,
+    manager_name: string,
 }
 
 export interface ReceiptAPI {
@@ -43,6 +50,7 @@ export interface ReceiptAPI {
     user_name: string,
     lines: LineAPI[],
     payment: string,
+    refund?: RefundAPI,
 }
 
 export interface Status {

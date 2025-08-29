@@ -1,5 +1,5 @@
 import { ActivityIndicator } from "react-native";
 
-export default function Indicator ({ isLarge }: Readonly<{ isLarge?: boolean }>) {
-  return <ActivityIndicator color = "white" size = { isLarge ? "large" : "small" }/>;
+export default function Indicator () {
+  return <ActivityIndicator color = "white"/>;
 }

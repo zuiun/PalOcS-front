@@ -46,7 +46,8 @@ export default function Customisation () {
                             transactions.add ({
                               id: c.id,
                               name: c.name,
-                              price: c.price[0],
+                              size: 0,
+                              price: c.price,
                           })}/>
                         )
                   }

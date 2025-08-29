@@ -23,6 +23,7 @@ export default function Screen ({ children }: Readonly<{ children: React.ReactNo
           <Transaction purchases = { transactions.purchases.map ((p) => {
             return {
               name: p.name,
+              size: p.size,
               price: p.price,
               discount_name: p.discount?.name,
               discount_value: p.discount?.value,

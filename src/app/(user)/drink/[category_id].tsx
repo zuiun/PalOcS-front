@@ -41,68 +41,53 @@ export default function CategoryID () {
   }, [sizeIdx]);
 
   return (
-    <View style = {[ styles.screen ]}>
-      <View style = {[ styles.row, { flex: 4 } ]}>
-        <View style = {[ styles.container, { flex: 1 } ]}>
-          <Section title = "Size">
-            <Grid align = { 1 }>
-              <Panel title = "Small" colour = { sizeIdx === 0 ? colourSelected : colourDefault } onPress = { () => setSizeIdx (0) }/>
-              <Panel title = "Medium" colour = { sizeIdx === 1 ? colourSelected : colourDefault } onPress = { () => setSizeIdx (1) }/>
-              <Panel title = "Large" colour = { sizeIdx === 2 ? colourSelected : colourDefault } onPress = { () => setSizeIdx (2) }/>
-            </Grid>
-          </Section>
-        </View>
-        <View style = {[ styles.container, { flex: 4 } ]}>
-          <Query result = { subcategories }>
-            <Query result = { drinks }>
-              {
-                subcategories.data?.map ((s: SubcategoryAPI) => 
-                  <Section key = { s.id } title = { s.name }>
-                    <Grid align = { 6 }>
-                      {
-                        drinks.data?.filter ((d: ProductAPI) => d.subcategory_id === s.id)
-                          .map ((d: ProductAPI) =>
-                            <Panel key = { d.id } title = { d.name } onPress = { () => {
-                              if (sizeIdx > uninitialisedIdx) {
-                                if (sizeIdx < d.price.length) {
-                                  let size = "";
-
-                                  switch (sizeIdx) {
-                                    case 0:
-                                      size = "(S)";
-                                      break;
-                                    case 1:
-                                      size = "(M)";
-                                      break;
-                                    case 2:
-                                      size = "(L)";
-                                      break;
-                                  }
-
-                                  transactions.add ({
-                                    id: d.id,
-                                    name: `${d.name} ${size}`,
-                                    price: d.price[sizeIdx],
-                                  });
-                                // Not an error; use default price
-                                } else {
-                                  transactions.add ({
-                                    id: d.id,
-                                    name: `${d.name} (S)`,
-                                    price: d.price[0],
-                                  });
-                                }
+    <View style = { styles.screen }>
+      <View style = {[ styles.container, { flex: 1 } ]}>
+        <Section title = "Size">
+          <Grid align = { 1 }>
+            <Panel title = "Small" colour = { sizeIdx === 0 ? colourSelected : colourDefault } onPress = { () => setSizeIdx (0) }/>
+            <Panel title = "Medium" colour = { sizeIdx === 1 ? colourSelected : colourDefault } onPress = { () => setSizeIdx (1) }/>
+            <Panel title = "Large" colour = { sizeIdx === 2 ? colourSelected : colourDefault } onPress = { () => setSizeIdx (2) }/>
+          </Grid>
+        </Section>
+      </View>
+      <View style = {[ styles.container, { flex: 4 } ]}>
+        <Query result = { subcategories }>
+          <Query result = { drinks }>
+            {
+              subcategories.data?.map ((s: SubcategoryAPI) => 
+                <Section key = { s.id } title = { s.name }>
+                  <Grid align = { 6 }>
+                    {
+                      drinks.data?.filter ((d: ProductAPI) => d.subcategory_id === s.id)
+                        .map ((d: ProductAPI) =>
+                          <Panel key = { d.id } title = { d.name } onPress = { () => {
+                            if (d.price.length > 1) {
+                              if (sizeIdx > uninitialisedIdx && sizeIdx < d.price.length) {
+                                transactions.add ({
+                                  id: d.id,
+                                  name: d.name,
+                                  size: sizeIdx,
+                                  price: d.price,
+                                });
                               }
-                            }}/>
-                          )
-                      }
-                    </Grid>
-                  </Section>
-                )
-              }
-            </Query>
+                            } else {
+                              transactions.add ({
+                                id: d.id,
+                                name: d.name,
+                                size: 0,
+                                price: d.price,
+                              });
+                            }
+                          }}/>
+                        )
+                    }
+                  </Grid>
+                </Section>
+              )
+            }
           </Query>
-        </View>
+        </Query>
       </View>
     </View>
   );
@@ -112,8 +97,6 @@ const styles = StyleSheet.create ({
   screen: {
     width: "100%",
     height: "100%",
-  },
-  row: {
     flexDirection: "row",
     justifyContent: "space-evenly",
   },

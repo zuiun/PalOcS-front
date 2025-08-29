@@ -1,8 +1,10 @@
 import { useRouter } from "expo-router";
-import { useContext, useState } from "react";
+import { useContext, useEffect, useState } from "react";
+import { Dimensions, StyleSheet, View } from "react-native";
 import { useMutation, useQuery } from "@tanstack/react-query";
 import Grid, { Panel } from "@/components/Grid";
 import Indicator from "@/components/Indicator";
+import Input from "@/components/Input";
 import Popup from "@/components/Popup";
 import Receipt from "@/components/Receipt";
 import Section from "@/components/Section";
@@ -10,7 +12,8 @@ import Query from "@/components/Query";
 import SelectedIdxsContext from "@/contexts/SelectedIdxsContext";
 import TransactionContext from "@/contexts/TransactionContext";
 import UserContext from "@/contexts/UserContext";
-import { DiscountAPI, ReceiptAPI } from "@/utils/types";
+import { DiscountAPI, ReceiptAPI, RefundAPI } from "@/utils/types";
+import { colourDefault, colourSelected } from "@/utils/globals";
 
 export default function Pay () {
   const router = useRouter ();
@@ -38,6 +41,8 @@ export default function Pay () {
           user_id: user.id,
           purchases: transactions.purchases,
           payment: payment,
+          is_refund: isRefund,
+          manager_id: manager?.id,
         }),
       });
 
@@ -51,39 +56,27 @@ export default function Pay () {
   const handlePress = async (payment: string) => {
     if (transactions.purchases.length > 0) {
       setVisibleIndicator (true);
+      setPayment (payment);
 
-      try {
-        const result = await postTransaction.mutateAsync (payment);
-        const id: number = result.id;
-        const timestamp: string = result.timestamp;
+      if (isRefund) {
+        const { status } = await user.validate (user.id, true);
 
-        setReceipt ({
-          id: id,
-          timestamp: timestamp,
-          user_id: user.id,
-          user_name: user.name,
-          payment: payment,
-          lines: transactions.purchases.map ((p) => {
-            return {
-              name: p.name,
-              price: p.price,
-              discount_name: p.discount?.name,
-              discount_value: p.discount?.value,
-            }
-          }),
-        });
-        setVisibleIndicator (false);
-        setVisibleReceipt (true);
-      } catch (error) {
-        console.log (error);
+        // Suspend transaction until manager completes refund
+        if (status.isError || ! status.isSuccess) {
+          setVisibleInput (true);
+          setVisibleIndicator (false);
+          return;
+        } else {
+          setManager ({ id: user.id, name: user.name });
+        }
       }
 
-      transactions.clear ();
-      selectedIdxs.clear ();
+      setApproved (true);
     }
   };
   const [isVisibleIndicator, setVisibleIndicator] = useState (false);
   const [isVisibleReceipt, setVisibleReceipt] = useState (false);
+  const [isVisibleInput, setVisibleInput] = useState (false);
   const [receipt, setReceipt] = useState<ReceiptAPI> ({
     id: 0,
     timestamp: "",
@@ -92,39 +85,144 @@ export default function Pay () {
     lines: [],
     payment: "",
   });
+  const [isRefund, setRefund] = useState (false);
+  const [payment, setPayment] = useState<string | undefined> (undefined);
+  const [manager, setManager] = useState<{ id: string, name: string } | undefined> (undefined);
+  const [isApproved, setApproved] = useState (false);
+
+  useEffect (() => {
+    const completeTransaction = async (payment: string) => {
+      setVisibleIndicator (true);
+
+      try {
+        const result = await postTransaction.mutateAsync (payment);
+        const id: number = result.id;
+        const timestamp: string = result.timestamp;
+        const refund: RefundAPI | undefined = manager ?
+          {
+            manager_id: manager.id,
+            manager_name: manager.name,
+          }
+        :
+          undefined;
+
+        setReceipt ({
+          id: id,
+          timestamp: timestamp,
+          user_id: user.id,
+          user_name: user.name,
+          lines: transactions.purchases.map ((p) => {
+            return {
+              name: p.name,
+              size: p.size,
+              price: p.price,
+              discount_name: p.discount?.name,
+              discount_value: p.discount?.value,
+            }
+          }),
+          payment: payment,
+          refund: refund,
+        });
+        setVisibleIndicator (false);
+        setVisibleReceipt (true);
+        transactions.clear ();
+        selectedIdxs.clear ();
+      } catch (error) {
+        console.log (`Fetch Error ${error}`);
+        setApproved (false);
+      }
+    };
+
+    if (isApproved && payment) {
+      if (! isRefund || manager) {
+        completeTransaction (payment);
+      }
+    }
+  }, [isApproved, payment, isRefund, manager]);
 
   return (
-    <>
-      <Popup visible = { isVisibleIndicator || isVisibleReceipt } onPress = { () => {
+    <View style = { styles.screen }>
+      <Popup visible = { isVisibleIndicator || isVisibleReceipt || isVisibleInput } onPress = { () => {
         setVisibleIndicator (false);
         setVisibleReceipt (false);
-        router.replace ("/drink");
+        setVisibleInput (false);
+        setPayment (undefined);
+        setManager (undefined);
+
+        if (isApproved) {
+          router.replace ("/drink");
+        } else {
+          setApproved (false);
+        }
       } }>
-        { isVisibleIndicator && <Indicator isLarge = { true }/> }
+        { isVisibleIndicator && <Indicator/> }
+        { isVisibleInput && <View style = { styles.input }>
+          <Input title = {"Enter manager ID"} onPress = { async (id: string) => {
+            const validation = await user.validate (id, true);
+
+            if (! validation.status.isError && validation.status.isSuccess) {
+              setManager ({ id: validation.id!, name: validation.name! });
+            }
+
+            return validation.status;
+          } } onSuccess = { () => {
+            setApproved (true);
+            setVisibleInput (false);
+          } }/>
+        </View> }
         { isVisibleReceipt && <Receipt receipt = { receipt }/>}
       </Popup>
-      <Section title = "Pay">
-        <Grid align = { 3 }>
-          {/* In an actual POS, onPress would activate the card reader/register */}
-          <Panel title = "Card" onPress = { () => handlePress ("Card") }/>
-          <Panel title = "Cash" onPress = { () => handlePress ("Cash") }/>
-          <Panel title = "Student ID" onPress = { () => handlePress ("Student ID") }/>
+      <View style = {[ styles.container, { flex: 1 } ]}>
+        <Grid align = { 1 }>
+          <Panel title = "Refund" colour = { isRefund ? colourSelected : colourDefault } onPress = { () => setRefund (! isRefund) }/>
         </Grid>
-      </Section>
-      <Section title = "Discounts">
-        <Query result = { discounts }>
-          <Grid align = { 4 }>
-            {
-              discounts.data?.map ((d: DiscountAPI) =>
-                <Panel key = { d.id } title = { d.name } onPress = { () => {
-                  selectedIdxs.selectedIdxs.forEach ((i) => transactions.setDiscount (i, d));
-                  selectedIdxs.clear ();
-                } }/>
-              )
-            }
+      </View>
+      <View style = {[ styles.container, { flex: 4 } ]}>
+        <Section title = "Pay">
+          <Grid align = { 3 }>
+            {/* In an actual POS, onPress would activate the card reader/register */}
+            <Panel title = "Card" onPress = { () => handlePress ("Card") }/>
+            <Panel title = "Cash" onPress = { () => handlePress ("Cash") }/>
+            <Panel title = "Student ID" onPress = { () => handlePress ("Student ID") }/>
           </Grid>
-        </Query>
-      </Section>
-    </>
+        </Section>
+        <Section title = "Discounts">
+          <Query result = { discounts }>
+            <Grid align = { 4 }>
+              {
+                discounts.data?.map ((d: DiscountAPI) =>
+                  <Panel key = { d.id } title = { d.name } onPress = { () => {
+                    selectedIdxs.selectedIdxs.forEach ((i) => transactions.setDiscount (i, d));
+                    selectedIdxs.clear ();
+                  } }/>
+                )
+              }
+            </Grid>
+          </Query>
+        </Section>
+      </View>
+    </View>
   );
 }
+
+const styles = StyleSheet.create ({
+  screen: {
+    width: "100%",
+    height: "100%",
+    flexDirection: "row",
+    justifyContent: "space-evenly",
+  },
+  container: {
+    flexDirection: "column",
+    justifyContent: "space-evenly",
+    alignContent: "center",
+    alignItems: "center"
+  },
+  input: {
+    backgroundColor: "#25292e",
+    borderWidth: 1,
+    borderColor: "#fff",
+    paddingLeft: 0.02 * Dimensions.get ("window").height,
+    paddingRight: 0.02 * Dimensions.get ("window").height,
+  },
+});
