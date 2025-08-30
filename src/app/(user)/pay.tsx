@@ -4,7 +4,7 @@ import { Dimensions, StyleSheet, View } from "react-native";
 import { useMutation, useQuery } from "@tanstack/react-query";
 import Grid, { Panel } from "@/components/Grid";
 import Indicator from "@/components/Indicator";
-import Input from "@/components/Input";
+import InputID from "@/components/InputID";
 import Popup from "@/components/Popup";
 import Receipt from "@/components/Receipt";
 import Section from "@/components/Section";
@@ -41,7 +41,7 @@ export default function Pay () {
         },
         body: JSON.stringify ({
           user_id: user.id,
-          purchases: transactions.purchases,
+          purchases: transactions.toPurchases (),
           payment: payment,
           tax: tax,
           is_refund: isRefund,
@@ -152,7 +152,7 @@ export default function Pay () {
       } }>
         { isVisibleIndicator && <Indicator/> }
         { isVisibleInput && <View style = { styles.input }>
-          <Input title = {"Enter manager ID"} onPress = { async (id: string) => {
+          <InputID title = {"Enter manager ID"} onPress = { async (id: string) => {
             const validation = await user.validate (id, true);
 
             if (! validation.status.isError && validation.status.isSuccess) {

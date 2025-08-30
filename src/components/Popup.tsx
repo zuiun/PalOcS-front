@@ -1,5 +1,4 @@
 import { Modal, Pressable, StyleSheet } from "react-native";
-// import Paragraph from "@/components/Paragraph";
 
 export default function Popup ({ children, visible, onPress }: Readonly<{ children: React.ReactNode, visible: boolean, onPress: () => void }>) {
   return (

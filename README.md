@@ -16,8 +16,6 @@ npm install
 ## Usage
 
 Run `npm run start`.
-Add applicable sales tax rate as `EXPO_PUBLIC_TAX_RATE` to a .env file.
-Tax rate is given in hundredths of a percent (27,00% = 2700).
 Host the [back-end API](https://github.com/zuiun/PalOcS-back) and add `EXPO_PUBLIC_API_URL` to a .env file.
 
 I do not know if PalOcS runs on any platform other than web.

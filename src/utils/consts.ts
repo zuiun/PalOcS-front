@@ -3,3 +3,5 @@ export const colourDefault = "red";
 export const colourSelected = "blue";
 export const colourTab = "green";
 export const colourSpecial = "purple";
+export const taxRate = 27_00;
+export const currencySymbol = "$";

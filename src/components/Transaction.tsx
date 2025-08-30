@@ -1,19 +1,11 @@
 import { useContext } from "react";
 import { Dimensions, FlatList, Pressable, StyleProp, StyleSheet, View, ViewStyle } from "react-native";
 import Paragraph from "@/components/Paragraph";
+import Separator from "@/components/Separator";
 import SelectedIdxsContext from "@/contexts/SelectedIdxsContext";
-import { calculatePrice, calculateSubtotal, calculateTax } from "@/utils/helpers";
+import { calculatePrice, calculateSubtotal, calculateTax, convertDecimal } from "@/utils/helpers";
+import { currencySymbol, taxRate } from "@/utils/consts";
 import { LineAPI, RefundAPI } from "@/utils/types";
-
-const CURRENCY_SYMBOL = "$";
-
-function convertDecimal (number: number) {
-  const units = Math.floor (number / 1_00);
-  const decimals = number % 1_00;
-  const decimalsPadded = `${decimals}`.padStart (2, "0");
-
-  return `${units},${decimalsPadded}`;
-}
 
 function convertSize (size: number) {
   switch (size) {
@@ -28,10 +20,6 @@ function convertSize (size: number) {
   }
 }
 
-function Separator () {
-  return <View style = { styles.separator }/>;
-}
-
 function Line ({ line, style, isRefund, onPress }: Readonly<{ line: LineAPI, style?: StyleProp<ViewStyle>, isRefund: boolean, onPress?: () => undefined }>) {
   const price = calculatePrice (line.price[line.size], line.discount_value);
   let row = (
@@ -43,7 +31,7 @@ function Line ({ line, style, isRefund, onPress }: Readonly<{ line: LineAPI, sty
         { line.discount_name } -{ line.discount_value }%
       </Paragraph> }
       <Paragraph style = {[ styles.right, isRefund && styles.centre, { flex: 1 } ]}>
-        { isRefund && "-" }{ CURRENCY_SYMBOL }{ convertDecimal (price) }
+        { isRefund && "-" }{ currencySymbol }{ convertDecimal (price) }
       </Paragraph>
     </>
   );
@@ -72,7 +60,7 @@ export default function Transaction ({ purchases, isSelectable, payment, refund 
 
   return (
     <>
-      <FlatList contentContainerStyle = {[ styles.list ]} data = { purchases }
+      <FlatList contentContainerStyle = { styles.list } data = { purchases }
           ItemSeparatorComponent = { Separator }
           keyExtractor = { (item, index) => `${item.name}-${index}` }
           renderItem = { ({item, index}) => {
@@ -100,15 +88,15 @@ export default function Transaction ({ purchases, isSelectable, payment, refund 
             Subtotal
           </Paragraph>
           <Paragraph style = {[ styles.right, refund && styles.centre, { flex: 1} ]}>
-            { refund && "-" }{ CURRENCY_SYMBOL }{ convertDecimal (subtotal) }
+            { refund && "-" }{ currencySymbol }{ convertDecimal (subtotal) }
           </Paragraph>
         </View>
         <View style = { styles.row }>
           <Paragraph style = {[ styles.left, { flex: 4} ]}>
-            Tax ({ convertDecimal (parseInt (process.env.EXPO_PUBLIC_TAX_RATE!)) }%)
+            Tax ({ convertDecimal (taxRate) }%)
           </Paragraph>
           <Paragraph style = {[ styles.right, refund && styles.centre, { flex: 1} ]}>
-            { CURRENCY_SYMBOL }{ convertDecimal (tax) }
+            { currencySymbol }{ convertDecimal (tax) }
           </Paragraph>
         </View>
         <View style = { styles.row }>
@@ -116,7 +104,7 @@ export default function Transaction ({ purchases, isSelectable, payment, refund 
             Total
           </Paragraph>
           <Paragraph style = {[ styles.right, refund && styles.centre, { flex: 1} ]}>
-            { refund && "-" }{ CURRENCY_SYMBOL }{ convertDecimal (subtotal + tax) }
+            { refund && "-" }{ currencySymbol }{ convertDecimal (subtotal + tax) }
           </Paragraph>
         </View>
         {
@@ -145,10 +133,6 @@ const styles = StyleSheet.create ({
     justifyContent: "flex-start",
     borderColor: "#fff",
     borderWidth: 1,
-  },
-  separator: {
-    height: 1,
-    backgroundColor: "#fff",
   },
   total: {
     alignItems: "center",
@@ -184,5 +168,5 @@ const styles = StyleSheet.create ({
   item: {
     paddingTop: 0.003 * Dimensions.get ("window").height,
     paddingBottom: 0.003 * Dimensions.get ("window").height,
-  }
+  },
 });

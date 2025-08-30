@@ -1,76 +1,64 @@
 import { useContext, useState } from "react";
 import { Dimensions, StyleSheet, View } from "react-native";
-import { queryClient } from "@/app/_layout";
+import { useMutation } from "@tanstack/react-query";
 import Grid, { Panel } from "@/components/Grid";
-import Input from "@/components/Input";
+import Indicator from "@/components/Indicator";
 import Popup from "@/components/Popup";
-import Receipt from "@/components/Receipt";
 import SelectedIdxsContext from "@/contexts/SelectedIdxsContext";
 import TransactionContext from "@/contexts/TransactionContext";
 import UserContext from "@/contexts/UserContext";
 import { colourSpecial, colourTab } from "@/utils/consts";
-import { ReceiptAPI } from "@/utils/types";
+import { PurchaseAPI } from "@/utils/types";
 
 export default function Footer ({ flex }: Readonly<{ flex: number }>) {
   const user = useContext (UserContext);
   const transactions = useContext (TransactionContext);
   const selectedIdxs = useContext (SelectedIdxsContext);
-  const [isVisibleInput, setVisibleInput] = useState (false);
-  const [isVisibleReceipt, setVisibleReceipt] = useState (false);
-  const [receipt, setReceipt] = useState<ReceiptAPI> ({
-    id: 0,
-    timestamp: "",
-    user_id: "",
-    user_name: "",
-    lines: [],
-    payment: "",
-  });
-  const handlePress = async (id: string) => {
-    const getTransaction = async () => {
-      const response = await fetch (`${process.env.EXPO_PUBLIC_API_URL}/transaction/${id}`);
+  const [isVisibleIndicator, setVisibleIndicator] = useState (false);
+  const postVoid = useMutation ({
+    mutationFn: async () => {
+      const purchases = transactions.purchases.filter ((_, i) => selectedIdxs.selectedIdxs.includes (i));
+      const voids: PurchaseAPI[] = purchases.map ((p) => {
+        return {
+          id: p.id,
+          size: p.size,
+          discount_id: p.discount?.id,
+        };
+      });
+      const response = await fetch (`${process.env.EXPO_PUBLIC_API_URL}/void/${user.id}`, {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json",
+        },
+        body: JSON.stringify ({
+          voids: voids,
+        }),
+      });
 
-      if (response.ok) {
-        return await response.json ();
-      } else if (response.status === 404) {
-        throw new RangeError (`No transaction found with ID ${id}`);
-      } else {
+      if (! response.ok) {
         throw new Error (`${response.status}`);
       }
-    };
-    let receiptNew: ReceiptAPI;
-
-    try {
-      receiptNew = await queryClient.fetchQuery ({ queryKey: [`/transaction/${id}`], queryFn: getTransaction });
-    } catch (error) {
-      console.log (`Fetch Error: ${error}`);
-
-      if (error instanceof RangeError) {
-        return { isError: false, isSuccess: false };
-      } else {
-        return { isError: true, isSuccess: false };
+    },
+  });
+  const handlePress = async () => {
+    if (selectedIdxs.selectedIdxs.length > 0) {
+      try {
+        setVisibleIndicator (true);
+        await postVoid.mutateAsync ();
+        transactions.remove (selectedIdxs.selectedIdxs);
+        selectedIdxs.clear ();
+      } catch (error) {
+        console.log (`Fetch Error ${error}`);
+      } finally {
+        setVisibleIndicator (false);
       }
     }
-
-    setReceipt (receiptNew);
-    return { isError: false, isSuccess: true };
   };
 
   return (
     <>
-      <Popup visible = { isVisibleInput || isVisibleReceipt } onPress = { () => {
-        setVisibleInput (false);
-        setVisibleReceipt (false);
-      } }>
-        { isVisibleInput && <View style = { styles.input }>
-          <Input title = "Enter transaction ID"
-              onPress = { handlePress }
-              onSuccess = { () => {
-                setVisibleInput (false);
-                setVisibleReceipt (true);
-              }
-          }/>
-        </View> }
-        { isVisibleReceipt && <Receipt receipt = { receipt }/> }
+      <Popup visible = { isVisibleIndicator } onPress = { () => undefined }>
+        <Indicator/>
       </Popup>
       <View style = {[ styles.row, { flex: flex } ]}>
         <Grid align = { 2 }>
@@ -78,12 +66,9 @@ export default function Footer ({ flex }: Readonly<{ flex: number }>) {
           <Panel href = "/customisation" title = "Customisation" colour = { colourTab }/>
         </Grid>
         <Grid align = { 4 }>
-          <Panel title = "Void" colour = { colourSpecial } onPress = { () => {
-            transactions.remove (selectedIdxs.selectedIdxs);
-            selectedIdxs.clear ();
-          } }/>
+          <Panel title = "Void" colour = { colourSpecial } onPress = { handlePress }/>
           <Panel href = "/pay" title = "Pay" colour = { colourSpecial }/>
-          <Panel title = "Reprint" colour = { colourSpecial } onPress = { () => setVisibleInput (true) }/>
+          <Panel href = "/function" title = "Function" colour = { colourSpecial }/>
           <Panel href = "/" title = "Exit" colour = { colourSpecial } onPress = { () => {
             user.logout ();
             transactions.clear ();

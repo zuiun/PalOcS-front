@@ -1,6 +1,6 @@
 import { createContext, useEffect, useState } from "react";
 import AsyncStorage from "@react-native-async-storage/async-storage";
-import { DiscountAPI, LineAPI, Purchase } from "@/utils/types";
+import { DiscountAPI, LineAPI, Purchase, PurchaseAPI } from "@/utils/types";
 
 interface Transaction {
   purchases: Purchase[],
@@ -9,6 +9,7 @@ interface Transaction {
   clear: () => void,
   setDiscount: (idx: number, discount: DiscountAPI) => void,
   toLines: () => LineAPI[],
+  toPurchases: () => PurchaseAPI[],
 }
 
 const TransactionContext = createContext<Transaction> ({
@@ -27,7 +28,10 @@ const TransactionContext = createContext<Transaction> ({
   },
   toLines: () => {
     throw new Error ("Not Implemented");
-  }
+  },
+  toPurchases: () => {
+    throw new Error ("Not Implemented");
+  },
 });
 export const KEY = "transaction";
 
@@ -106,6 +110,17 @@ export function TransactionProvider ({ children }: Readonly<{ children: React.Re
 
     return lines;
   };
+  const toPurchases = () => {
+    const purchasesApi: PurchaseAPI[] = purchases.map ((p) => {
+      return {
+        id: p.id,
+        size: p.size,
+        discount_id: p.discount?.id,
+      }
+    });
+
+    return purchasesApi;
+  };
 
   useEffect (() => {
     const getItem = async () => {
@@ -129,7 +144,7 @@ export function TransactionProvider ({ children }: Readonly<{ children: React.Re
   }, [isInit]);
 
   return (
-    <TransactionContext.Provider value = {{ purchases, add, remove, clear, setDiscount, toLines }}>
+    <TransactionContext.Provider value = {{ purchases, add, remove, clear, setDiscount, toLines, toPurchases }}>
       { children }
     </TransactionContext.Provider>
   );

@@ -44,7 +44,6 @@ const styles = StyleSheet.create ({
     borderLeftWidth: 1,
   },
   text: {
-    textAlign: "center",
     textAlignVertical: "center",
   },
   row: {

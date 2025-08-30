@@ -1,1 +1,1 @@
-add reporting
+maybe factor out an Input

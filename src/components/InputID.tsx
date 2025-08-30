@@ -7,7 +7,7 @@ import Section from "@/components/Section";
 import { colourSpecial } from "@/utils/consts";
 import { Status } from "@/utils/types";
 
-export default function Input ({ title, onPress, onSuccess }: Readonly<{ title: string, onPress: (id: string) => Promise<Status>, onSuccess: () => undefined }>) {
+export default function InputID ({ title, onPress, onSuccess }: Readonly<{ title: string, onPress: (id: string) => Promise<Status>, onSuccess: () => undefined }>) {
   const id = useRef ("");
   const [isError, setError] = useState (false);
   const [isPending, setPending] = useState (false);
