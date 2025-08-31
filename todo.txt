@@ -1,1 +1,2 @@
-maybe factor out an Input
+perhaps Pressable should change colour onPress
+post generated reports and get if they already exist?

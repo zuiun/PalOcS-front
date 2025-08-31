@@ -1,5 +1,5 @@
 import { router, useLocalSearchParams } from "expo-router";
-import { useContext, useEffect, useState } from "react";
+import { useContext, useState } from "react";
 import { StyleSheet, View } from "react-native";
 import { useQuery } from "@tanstack/react-query";
 import Grid, { Panel } from "@/components/Grid";
@@ -33,21 +33,21 @@ export default function CategoryID () {
   const subcategories = useQuery ({ queryKey: [`/product/${category_id}/categories`], queryFn: getSubcategories });
   const drinks = useQuery ({ queryKey: [`/product/${category_id}`], queryFn: getDrinks });
   const transactions = useContext (TransactionContext);
-
-  useEffect (() => {
+  const handlePress = (sizeIdx: number) => {
     if (sizeIdx > uninitialisedIdx) {
       router.setParams ({ size: sizeIdx });
+      setSizeIdx (sizeIdx);
     }
-  }, [sizeIdx]);
+  };
 
   return (
     <View style = { styles.screen }>
       <View style = {[ styles.container, { flex: 1 } ]}>
         <Section title = "Size">
           <Grid align = { 1 }>
-            <Panel title = "Small" colour = { sizeIdx === 0 ? colourSelected : colourDefault } onPress = { () => setSizeIdx (0) }/>
-            <Panel title = "Medium" colour = { sizeIdx === 1 ? colourSelected : colourDefault } onPress = { () => setSizeIdx (1) }/>
-            <Panel title = "Large" colour = { sizeIdx === 2 ? colourSelected : colourDefault } onPress = { () => setSizeIdx (2) }/>
+            <Panel title = "Small" colour = { sizeIdx === 0 ? colourSelected : colourDefault } onPress = { () => handlePress (0) }/>
+            <Panel title = "Medium" colour = { sizeIdx === 1 ? colourSelected : colourDefault } onPress = { () => handlePress (1) }/>
+            <Panel title = "Large" colour = { sizeIdx === 2 ? colourSelected : colourDefault } onPress = { () => handlePress (2) }/>
           </Grid>
         </Section>
       </View>

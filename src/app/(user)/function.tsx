@@ -1,6 +1,6 @@
-import { useContext, useState } from "react";
+import { useContext, useRef, useState } from "react";
 import { Dimensions, StyleSheet, View } from "react-native";
-import { queryClient } from "@/app/_layout";
+import { useQueryClient } from "@tanstack/react-query";
 import Grid, { Panel } from "@/components/Grid";
 import InputDate from "@/components/InputDate";
 import InputID from "@/components/InputID";
@@ -13,31 +13,16 @@ import { colourDefault } from "@/utils/consts";
 import { ReceiptAPI, ReportAPI } from "@/utils/types";
 
 export default function Function () {
+  const queryClient = useQueryClient ();
   const user = useContext (UserContext);
   const [isVisibleIDReceipt, setVisibleIDReceipt] = useState (false);
   const [isVisibleReceipt, setVisibleReceipt] = useState (false);
-  const [receipt, setReceipt] = useState<ReceiptAPI> ({
-    id: 0,
-    timestamp: "",
-    user_id: "",
-    user_name: "",
-    lines: [],
-    payment: "",
-  });
+  const receipt = useRef<ReceiptAPI | undefined> (undefined);
   const [isVisibleIDReport, setVisibleIDReport] = useState (false);
   const [isVisibleDate, setVisibleDate] = useState (false);
   const [isVisibleReport, setVisibleReport] = useState (false);
-  const [id, setID] = useState ("");
-  const [report, setReport] = useState<ReportAPI> ({
-    user_id: "",
-    user_name: "",
-    date: "",
-    voids: [],
-    refunds: [],
-    sales_cash: [],
-    sales_not_cash: [],
-    tax: 0,
-  });
+  const id = useRef ("");
+  const report = useRef<ReportAPI | undefined> (undefined);
   const handlePressReceipt = async (id: string) => {
     const getTransaction = async () => {
       const response = await fetch (`${process.env.EXPO_PUBLIC_API_URL}/transaction/${id}`);
@@ -64,19 +49,19 @@ export default function Function () {
       }
     }
 
-    setReceipt (receiptNew);
+    receipt.current = receiptNew;
     return { isError: false, isSuccess: true };
   };
-  const handlePressReportID = async (id: string) => {
-    const validation = await user.validate (id, false);
+  const handlePressReportID = async (idNew: string) => {
+    const validation = await user.validate (idNew, false);
 
     if (! validation.status.isError && validation.status.isSuccess) {
-      setID (id);
+      id.current = idNew;
     }
 
     return validation.status;
   };
-  const handlePressReportDate = async (date: string) => {
+  const handlePressReportDate = async (id: string, date: string) => {
     const getReport = async () => {
       const response = await fetch (`${process.env.EXPO_PUBLIC_API_URL}/report/${id}/${date}`);
 
@@ -104,7 +89,7 @@ export default function Function () {
       }
     }
 
-    setReport (reportNew);
+    report.current = reportNew;
     return { isError: false, isSuccess: true };
   };
 
@@ -117,13 +102,13 @@ export default function Function () {
         { isVisibleIDReceipt && <View style = { styles.input }>
           <InputID title = "Enter transaction ID"
               onPress = { handlePressReceipt }
-              onSuccess = { () => {
+              onSuccess = { async () => {
                 setVisibleIDReceipt (false);
                 setVisibleReceipt (true);
               }
           }/>
         </View> }
-        { isVisibleReceipt && <Receipt receipt = { receipt }/> }
+        { isVisibleReceipt && <Receipt receipt = { receipt.current! }/> }
       </Popup>
       <Popup visible = { isVisibleIDReport || isVisibleDate || isVisibleReport } onPress = { () => {
         setVisibleIDReport (false);
@@ -133,21 +118,21 @@ export default function Function () {
         { isVisibleIDReport && <View style = { styles.input }>
           <InputID title = "Enter user ID"
               onPress = { handlePressReportID }
-              onSuccess = { () => {
+              onSuccess = { async () => {
                 setVisibleIDReport (false);
                 setVisibleDate (true);
               }
           }/>
         </View> }
         { isVisibleDate && <View style = { styles.input }>
-          <InputDate onPress = { handlePressReportDate }
-              onSuccess = { () => {
+          <InputDate onPress = { async (date: string) => handlePressReportDate (id.current, date) }
+              onSuccess = { async () => {
                 setVisibleDate (false);
                 setVisibleReport (true);
               }
           }/>
         </View> }
-        { isVisibleReport && <Report report = { report } /> }
+        { isVisibleReport && <Report report = { report.current! } /> }
       </Popup>
       <Section title = "Function">
         <Grid align = { 2 }>

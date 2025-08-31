@@ -9,8 +9,8 @@ import UserContext from "@/contexts/UserContext";
 
 export default function UserLayout () {
   const user = useContext (UserContext);
-  const [isValidated, setValidated] = useState (false);
   const [isInit, setInit] = useState (false);
+  const [isValidated, setValidated] = useState (false);
 
   useEffect (() => {
     const getUser = async () => {
@@ -25,10 +25,10 @@ export default function UserLayout () {
       setInit (true);
     };
 
-    if (user.id.length > 0 && !isInit) {
+    if (user.id.length > 0) {
       getUser ();
     }
-  }, [user, isInit]);
+  }, [user]);
 
   return (
     isInit ?

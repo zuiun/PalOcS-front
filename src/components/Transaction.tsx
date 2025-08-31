@@ -96,7 +96,7 @@ export default function Transaction ({ purchases, isSelectable, payment, refund 
             Tax ({ convertDecimal (taxRate) }%)
           </Paragraph>
           <Paragraph style = {[ styles.right, refund && styles.centre, { flex: 1} ]}>
-            { currencySymbol }{ convertDecimal (tax) }
+            { refund && "-" }{ currencySymbol }{ convertDecimal (tax) }
           </Paragraph>
         </View>
         <View style = { styles.row }>

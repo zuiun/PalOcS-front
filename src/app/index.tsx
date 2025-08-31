@@ -8,6 +8,6 @@ export default function Index () {
   const user = useContext (UserContext);
 
   return (
-    <InputID title = "Enter user ID" onPress = { user.login } onSuccess = { () => { router.replace ("/drink"); } }/>
+    <InputID title = "Enter user ID" onPress = { user.login } onSuccess = { async () => router.replace ("/drink") }/>
   );
 }

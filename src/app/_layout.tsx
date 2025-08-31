@@ -3,7 +3,7 @@ import { StyleSheet, View } from "react-native";
 import { QueryClient, QueryClientProvider } from "@tanstack/react-query"
 import { UserProvider } from "@/contexts/UserContext";
 
-export const queryClient = new QueryClient ();
+const queryClient = new QueryClient ();
 
 export default function RootLayout () {
   return (

@@ -23,7 +23,6 @@ const SelectedIdxsContext = createContext<SelectedIdxs> ({
 export const KEY = "selection";
 
 export function SelectedIdxsProvider ({ children }: Readonly<{ children: React.ReactNode }>) {
-  const [isInit, setInit] = useState (false);
   const [selectedIdxs, setSelectedIdxs] = useState<number[]> ([]);
   const add = async (selectedIdx: number) => {
     const selectedIdxsNew = selectedIdxs.slice ();
@@ -81,11 +80,8 @@ export function SelectedIdxsProvider ({ children }: Readonly<{ children: React.R
       }
     };
 
-    if (!isInit) {
-      getItem ();
-      setInit (true);
-    }
-  }, [isInit]);
+    getItem ();
+  }, []);
 
   return (
     <SelectedIdxsContext.Provider value = {{ selectedIdxs, add, remove, clear }}>

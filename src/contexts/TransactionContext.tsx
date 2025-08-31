@@ -36,7 +36,6 @@ const TransactionContext = createContext<Transaction> ({
 export const KEY = "transaction";
 
 export function TransactionProvider ({ children }: Readonly<{ children: React.ReactNode }>) {
-  const [isInit, setInit] = useState (false);
   const [purchases, setPurchases] = useState<Purchase[]> ([]);
   const add = async (purchase: Purchase) => {
     const purchasesNew = purchases.slice ();
@@ -137,11 +136,8 @@ export function TransactionProvider ({ children }: Readonly<{ children: React.Re
       }
     };
 
-    if (!isInit) {
-      getItem ();
-      setInit (true);
-    }
-  }, [isInit]);
+    getItem ();
+  }, []);
 
   return (
     <TransactionContext.Provider value = {{ purchases, add, remove, clear, setDiscount, toLines, toPurchases }}>

@@ -1,34 +1,24 @@
 import { createContext, useEffect, useState } from "react";
 import AsyncStorage from "@react-native-async-storage/async-storage";
-import { queryClient } from "@/app/_layout";
+import { useQueryClient } from "@tanstack/react-query";
 import { Status } from "@/utils/types";
 
 interface User {
   id: string,
   name: string,
-  isManager: boolean,
   login: (id: string) => Promise<Status>,
   logout: () => void,
   validate: (id: string, isManager: boolean) => Promise<{ status: Status, id?: string, name?: string }>,
 }
 
-interface AuthenticationAPI {
+interface AuthenticationValidationAPI {
   ok: boolean,
-  id: string,
-  name: string,
-  is_manager: boolean,
-}
-
-interface ValidationAPI {
-    ok: boolean,
-    id: string,
-    name: string,
+  name?: string,
 }
 
 const UserContext = createContext<User> ({
   id: "",
   name: "",
-  isManager: false,
   login: (id: string) => {
     throw new Error ("Not Implemented");
   },
@@ -44,10 +34,9 @@ const TRUE = 1;
 const FALSE = 0;
 
 export function UserProvider ({ children }: Readonly<{ children: React.ReactNode }>) {
-  const [isInit, setInit] = useState (false);
+  const queryClient = useQueryClient ();
   const [id, setId] = useState ("");
   const [name, setName] = useState ("");
-  const [isManager, setManager] = useState (false);
   const login = async (id: string) => {
     const postSession = async () => {
       const response = await fetch (`${process.env.EXPO_PUBLIC_API_URL}/session`, {
@@ -67,14 +56,12 @@ export function UserProvider ({ children }: Readonly<{ children: React.ReactNode
       }
     };
     let name: string;
-    let isManager: boolean;
 
     try {
-      const authentication: AuthenticationAPI = await queryClient.fetchQuery ({ queryKey: [`/session/${id}`], queryFn: postSession });
+      const authentication: AuthenticationValidationAPI = await queryClient.fetchQuery ({ queryKey: [`/session/${id}`], queryFn: postSession });
 
       if (authentication.ok) {
-        name = authentication.name;
-        isManager = authentication.is_manager;
+        name = authentication.name!;
       } else {
         return { isError: false, isSuccess: false };
       }
@@ -85,7 +72,6 @@ export function UserProvider ({ children }: Readonly<{ children: React.ReactNode
 
     setId (id);
     setName (name);
-    setManager (isManager);
 
     try {
       const store = JSON.stringify ({ id: id, name: name });
@@ -121,10 +107,10 @@ export function UserProvider ({ children }: Readonly<{ children: React.ReactNode
     let name: string;
 
     try {
-      const validation: ValidationAPI = await queryClient.fetchQuery ({ queryKey: [`/user/${id}`], queryFn: getUser });
+      const validation: AuthenticationValidationAPI = await queryClient.fetchQuery ({ queryKey: [`/user/${id}`], queryFn: getUser });
 
       if (validation.ok) {
-        name = validation.name;
+        name = validation.name!;
       } else {
         return { status: { isError: false, isSuccess: false }, id: "", name: "" };
       }
@@ -152,14 +138,11 @@ export function UserProvider ({ children }: Readonly<{ children: React.ReactNode
       }
     };
 
-    if (!isInit) {
-      getItem ();
-      setInit (true);
-    }
-  }, [isInit]);
+    getItem ();
+  }, []);
 
   return (
-    <UserContext.Provider value = {{ id, name, isManager, login, logout, validate }}>
+    <UserContext.Provider value = {{ id, name, login, logout, validate }}>
       { children }
     </UserContext.Provider>
   );

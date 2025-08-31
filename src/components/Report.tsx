@@ -11,10 +11,10 @@ import { ReportAPI } from "@/utils/types";
 function Line ({ title, information, total }: Readonly<{ title: string, information: string, total: number }>) {
   return (
     <View style = {[ styles.item, styles.row, styles.pad ]}>
-      <Paragraph style = {[ styles.left, { flex: 3 } ]}>
+      <Paragraph style = {[ styles.left, { flex: 1 } ]}>
         { title }
       </Paragraph>
-      <Paragraph style = {[ styles.right, { flex: 1 } ]}>
+      <Paragraph style = {[ styles.right, { flex: 2 } ]}>
         { information } ({ currencySymbol }{ convertDecimal (total) })
       </Paragraph>
     </View>
@@ -101,21 +101,19 @@ export default function Report ({ report }: Readonly<{ report: ReportAPI }>) {
   //     }
   //   };
 
-  //   if (isInit) {
-  //     handleCompile ();
-  //   }
-  // }, [isInit]);
+  //   handleCompile ();
+  // }, []);
 
   return (
     <View style = { styles.transaction }>
       <View style = { styles.title }>
-        <Section title = { "Report" }>
+        <Section title = { `Report: ${report.user_id}, ${report.date}` }>
           <View style = { styles.row }>
             <Paragraph style = {[ styles.text, styles.left, { flex: 1 } ]}>
               { `${report.user_id} - ${report.user_name}` }
             </Paragraph>
             <Paragraph style = {[ styles.text, styles.right, { flex: 1 } ]}>
-              { report.date }
+              { report.timestamp } CET
             </Paragraph>
           </View>
         </Section>

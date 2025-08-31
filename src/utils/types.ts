@@ -67,6 +67,7 @@ export interface ReportAPI {
     user_id: string,
     user_name: string,
     date: string,
+    timestamp: string,
     voids: SaleAPI[],
     refunds: SaleAPI[],
     sales_cash: SaleAPI[],
