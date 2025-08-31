@@ -20,7 +20,7 @@ const SelectedIdxsContext = createContext<SelectedIdxs> ({
     throw new Error ("Not Implemented");
   },
 });
-export const KEY = "selection";
+const KEY = "selection";
 
 export function SelectedIdxsProvider ({ children }: Readonly<{ children: React.ReactNode }>) {
   const [selectedIdxs, setSelectedIdxs] = useState<number[]> ([]);

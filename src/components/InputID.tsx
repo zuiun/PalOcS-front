@@ -21,7 +21,7 @@ export default function InputID ({ title, onPress, onSuccess }: Readonly<{ title
 
 const styles = StyleSheet.create ({
   input: {
-    backgroundColor: "#fff",
+    backgroundColor: "white",
     width: 0.2 * Dimensions.get ("window").height,
     textAlign: "center",
   },

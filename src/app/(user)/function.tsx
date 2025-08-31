@@ -9,8 +9,8 @@ import Receipt from "@/components/Receipt";
 import Report from "@/components/Report";
 import Section from "@/components/Section";
 import UserContext from "@/contexts/UserContext";
-import { colourDefault } from "@/utils/consts";
-import { ReceiptAPI, ReportAPI } from "@/utils/types";
+import { colourBackground } from "@/utils/consts";
+import { Colour, ReceiptAPI, ReportAPI } from "@/utils/types";
 
 export default function Function () {
   const queryClient = useQueryClient ();
@@ -136,8 +136,8 @@ export default function Function () {
       </Popup>
       <Section title = "Function">
         <Grid align = { 2 }>
-          <Panel title = "Receipt" colour = { colourDefault } onPress = { () => setVisibleIDReceipt (true) }/>
-          <Panel title = "Report" colour = { colourDefault } onPress = { () => setVisibleIDReport (true) }/>
+          <Panel title = "Receipt" colour = { Colour.default } onPress = { () => setVisibleIDReceipt (true) }/>
+          <Panel title = "Report" colour = { Colour.default } onPress = { () => setVisibleIDReport (true) }/>
         </Grid>
       </Section>
     </>
@@ -146,19 +146,19 @@ export default function Function () {
 
 const styles = StyleSheet.create ({
   input: {
-    backgroundColor: "#25292e",
+    backgroundColor: colourBackground,
     borderWidth: 1,
-    borderColor: "#fff",
+    borderColor: "white",
     paddingLeft: 0.02 * Dimensions.get ("window").height,
     paddingRight: 0.02 * Dimensions.get ("window").height,
   },
   transaction: {
-    backgroundColor: "#25292e",
+    backgroundColor: colourBackground,
     width: 0.4 * Dimensions.get ("window").height,
     height: 0.8 * Dimensions.get ("window").height,
   },
   title: {
-    borderColor: "#fff",
+    borderColor: "white",
     borderTopWidth: 1,
     borderRightWidth: 1,
     borderLeftWidth: 1,

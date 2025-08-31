@@ -2,6 +2,7 @@ import { Dimensions, StyleSheet, View } from "react-native";
 import Paragraph from "@/components/Paragraph";
 import Section from "@/components/Section";
 import Transaction from "@/components/Transaction";
+import { colourBackground } from "@/utils/consts";
 import { ReceiptAPI } from "@/utils/types";
 
 export default function Receipt ({ receipt }: Readonly<{ receipt: ReceiptAPI }>) {
@@ -26,19 +27,19 @@ export default function Receipt ({ receipt }: Readonly<{ receipt: ReceiptAPI }>)
 
 const styles = StyleSheet.create ({
   input: {
-    backgroundColor: "#25292e",
+    backgroundColor: colourBackground,
     borderWidth: 1,
-    borderColor: "#fff",
+    borderColor: "white",
     paddingLeft: 0.02 * Dimensions.get ("window").height,
     paddingRight: 0.02 * Dimensions.get ("window").height,
   },
   transaction: {
-    backgroundColor: "#25292e",
+    backgroundColor: colourBackground,
     width: 0.4 * Dimensions.get ("window").height,
     height: 0.8 * Dimensions.get ("window").height,
   },
   title: {
-    borderColor: "#fff",
+    borderColor: "white",
     borderTopWidth: 1,
     borderRightWidth: 1,
     borderLeftWidth: 1,

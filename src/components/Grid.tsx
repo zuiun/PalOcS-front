@@ -2,10 +2,33 @@ import { Href, Link } from "expo-router";
 import React from "react";
 import { Dimensions, GestureResponderEvent, Pressable, StyleSheet, View } from "react-native";
 import Paragraph from "@/components/Paragraph";
+import { Colour } from "@/utils/types";
 
-export function Panel ({ href, title, colour = "red", onPress }: Readonly<{ href?: Href, title: string, colour?: string, onPress?: (event: GestureResponderEvent) => void }>) {
+export function Panel ({ href, title, colour = Colour.default, onPress }: Readonly<{ href?: Href, title: string, colour?: Colour, onPress?: (event: GestureResponderEvent) => void }>) {
+  let backgroundColour: string;
+  let pressedColour: string;
+
+  switch (colour) {
+    case Colour.selected:
+      backgroundColour = "blue";
+      pressedColour = "darkblue";
+      break;
+    case Colour.tab:
+      backgroundColour = "green";
+      pressedColour = "darkgreen";
+      break;
+    case Colour.special:
+      backgroundColour = "darkviolet";
+      pressedColour = "purple";
+      break;
+    default:
+      backgroundColour = "red";
+      pressedColour = "darkred";
+      break;
+  }
+
   const panel = (
-    <Pressable style = {[ styles.panel, { backgroundColor: colour } ]} onPress = { onPress }>
+    <Pressable style = {({ pressed }) => [ styles.panel, { backgroundColor: pressed ? pressedColour : backgroundColour} ]} onPress = { onPress }>
       <Paragraph style = { styles.text }>{ title }</Paragraph>
     </Pressable>
   );

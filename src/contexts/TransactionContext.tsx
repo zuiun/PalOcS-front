@@ -33,7 +33,7 @@ const TransactionContext = createContext<Transaction> ({
     throw new Error ("Not Implemented");
   },
 });
-export const KEY = "transaction";
+const KEY = "transaction";
 
 export function TransactionProvider ({ children }: Readonly<{ children: React.ReactNode }>) {
   const [purchases, setPurchases] = useState<Purchase[]> ([]);

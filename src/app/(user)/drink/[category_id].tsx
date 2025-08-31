@@ -6,8 +6,8 @@ import Grid, { Panel } from "@/components/Grid";
 import Section from "@/components/Section";
 import Query from "@/components/Query";
 import TransactionContext from "@/contexts/TransactionContext";
-import { colourDefault, colourSelected, uninitialisedIdx } from "@/utils/consts";
-import { ProductAPI, SubcategoryAPI } from "@/utils/types";
+import { uninitialisedIdx } from "@/utils/consts";
+import { Colour, ProductAPI, SubcategoryAPI } from "@/utils/types";
 
 export default function CategoryID () {  
   const { category_id }: { category_id: number } = useLocalSearchParams ();
@@ -45,9 +45,9 @@ export default function CategoryID () {
       <View style = {[ styles.container, { flex: 1 } ]}>
         <Section title = "Size">
           <Grid align = { 1 }>
-            <Panel title = "Small" colour = { sizeIdx === 0 ? colourSelected : colourDefault } onPress = { () => handlePress (0) }/>
-            <Panel title = "Medium" colour = { sizeIdx === 1 ? colourSelected : colourDefault } onPress = { () => handlePress (1) }/>
-            <Panel title = "Large" colour = { sizeIdx === 2 ? colourSelected : colourDefault } onPress = { () => handlePress (2) }/>
+            <Panel title = "Small" colour = { sizeIdx === 0 ? Colour.selected : Colour.default } onPress = { () => handlePress (0) }/>
+            <Panel title = "Medium" colour = { sizeIdx === 1 ? Colour.selected : Colour.default } onPress = { () => handlePress (1) }/>
+            <Panel title = "Large" colour = { sizeIdx === 2 ? Colour.selected : Colour.default } onPress = { () => handlePress (2) }/>
           </Grid>
         </Section>
       </View>

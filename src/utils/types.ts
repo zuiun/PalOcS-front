@@ -3,6 +3,13 @@ export interface Status {
     isSuccess: boolean,
 }
 
+export enum Colour {
+    default, // red
+    selected, // blue
+    tab, // green
+    special, // purple
+}
+
 export interface SubcategoryAPI {
     id: number,
     name: string,
@@ -66,20 +73,11 @@ interface SaleAPI {
 export interface ReportAPI {
     user_id: string,
     user_name: string,
-    date: string,
     timestamp: string,
+    date: string,
     voids: SaleAPI[],
     refunds: SaleAPI[],
     sales_cash: SaleAPI[],
     sales_not_cash: SaleAPI[],
     tax: number,
-}
-
-export interface CompilationAPI {
-  voids: [number, number],
-  refunds: [number, number],
-  sales_cash: [number, number],
-  sales_not_cash: [number, number],
-  discounts: [number, number],
-  tax: number,
 }

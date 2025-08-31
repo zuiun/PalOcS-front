@@ -3,8 +3,7 @@ import { Dimensions, StyleSheet, View } from "react-native";
 import Grid, { Panel } from "@/components/Grid";
 import Indicator from "@/components/Indicator";
 import Paragraph from "@/components/Paragraph";
-import { colourSpecial } from "@/utils/consts";
-import { Status } from "@/utils/types";
+import { Colour, Status } from "@/utils/types";
 
 export default function Input ({ children, onPress, onSuccess }: Readonly<{ children: React.ReactNode, onPress: () => Promise<Status>, onSuccess: () => Promise<void> }>) {
   const [isError, setError] = useState (false);
@@ -15,7 +14,7 @@ export default function Input ({ children, onPress, onSuccess }: Readonly<{ chil
     <View style = { styles.container }>
       { children }
       <Grid align = { 1 }>
-        <Panel title = "Enter" colour = { colourSpecial } onPress = { async () => {
+        <Panel title = "Enter" colour = { Colour.special } onPress = { async () => {
           setPending (true);
           setError (false);
           setFailure (false);

@@ -1,11 +1,12 @@
 import { Redirect, Slot } from "expo-router";
 import { useContext, useEffect, useState } from "react";
 import { StyleSheet, View } from "react-native";
+import AsyncStorage from "@react-native-async-storage/async-storage";
 import Indicator from "@/components/Indicator";
 import Screen from "@/components/Screen";
 import { SelectedIdxsProvider } from "@/contexts/SelectedIdxsContext";
 import { TransactionProvider } from "@/contexts/TransactionContext";
-import UserContext from "@/contexts/UserContext";
+import UserContext, { KEY } from "@/contexts/UserContext";
 
 export default function UserLayout () {
   const user = useContext (UserContext);
@@ -14,20 +15,25 @@ export default function UserLayout () {
 
   useEffect (() => {
     const getUser = async () => {
-      const { status } = await user.validate (user.id, false);
+      const resultJson = await AsyncStorage.getItem (KEY);
 
-      if (status.isError) {
+      if (resultJson) {
+        const result: { id: string, name: string } = JSON.parse (resultJson);
+        const { status } = await user.validate (result.id, false);
+
+        if (status.isError) {
+          setValidated (false);
+        } else if (status.isSuccess) {
+          setValidated (true);
+        }
+      } else {
         setValidated (false);
-      } else if (status.isSuccess) {
-        setValidated (true);
       }
 
       setInit (true);
     };
 
-    if (user.id.length > 0) {
-      getUser ();
-    }
+    getUser ();
   }, [user]);
 
   return (

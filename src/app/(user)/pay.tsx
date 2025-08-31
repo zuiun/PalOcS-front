@@ -12,9 +12,9 @@ import Query from "@/components/Query";
 import SelectedIdxsContext from "@/contexts/SelectedIdxsContext";
 import TransactionContext from "@/contexts/TransactionContext";
 import UserContext from "@/contexts/UserContext";
-import { colourDefault, colourSelected } from "@/utils/consts";
-import { calculateTax } from "@/utils/helpers";
-import { DiscountAPI, ReceiptAPI, RefundAPI } from "@/utils/types";
+import { colourBackground } from "@/utils/consts";
+import { calculateSubtotal, calculateTax } from "@/utils/helpers";
+import { Colour, DiscountAPI, ReceiptAPI, RefundAPI } from "@/utils/types";
 
 interface Manager {
   id: string,
@@ -38,7 +38,9 @@ export default function Pay () {
   const selectedIdxs = useContext (SelectedIdxsContext);
   const postTransaction = useMutation ({
     mutationFn: async ({ payment, manager }: { payment: string, manager: Manager | undefined }) => {
-      const tax = calculateTax (transactions.toLines ());
+      const lines = transactions.toLines ();
+      const subtotal = calculateSubtotal (lines);
+      const tax = calculateTax (lines);
       const response = await fetch (`${process.env.EXPO_PUBLIC_API_URL}/transaction`, {
         method: "POST",
         headers: {
@@ -48,6 +50,7 @@ export default function Pay () {
           user_id: user.id,
           purchases: transactions.toPurchases (),
           payment: payment,
+          subtotal: subtotal,
           tax: tax,
           is_refund: isRefund,
           manager_id: manager?.id,
@@ -118,11 +121,10 @@ export default function Pay () {
       transactions.clear ();
       selectedIdxs.clear ();
     } catch (error) {
-      console.log (`Fetch Error ${error}`);
+      console.log (`Mutate Error ${error}`);
       isApproved.current = false;
     }
   };
-
 
   return (
     <View style = { styles.screen }>
@@ -159,7 +161,7 @@ export default function Pay () {
       </Popup>
       <View style = {[ styles.container, { flex: 1 } ]}>
         <Grid align = { 1 }>
-          <Panel title = "Refund" colour = { isRefund ? colourSelected : colourDefault } onPress = { () => setRefund (! isRefund) }/>
+          <Panel title = "Refund" colour = { isRefund ? Colour.selected : Colour.default } onPress = { () => setRefund (! isRefund) }/>
         </Grid>
       </View>
       <View style = {[ styles.container, { flex: 4 } ]}>
@@ -204,9 +206,9 @@ const styles = StyleSheet.create ({
     alignItems: "center"
   },
   input: {
-    backgroundColor: "#25292e",
+    backgroundColor: colourBackground,
     borderWidth: 1,
-    borderColor: "#fff",
+    borderColor: "white",
     paddingLeft: 0.02 * Dimensions.get ("window").height,
     paddingRight: 0.02 * Dimensions.get ("window").height,
   },

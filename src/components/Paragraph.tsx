@@ -11,7 +11,7 @@ export default function Paragraph ({ children, style }: Readonly<{ children: Rea
 const styles = StyleSheet.create ({
   text: {
     fontFamily: "TimesNewRoman",
-    color: "#fff",
+    color: "white",
     // fontSize: 14,
     fontSize: 0.015 * Dimensions.get ("window").height,
   },

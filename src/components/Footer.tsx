@@ -1,3 +1,4 @@
+import { useRouter } from "expo-router";
 import { useContext, useState } from "react";
 import { Dimensions, StyleSheet, View } from "react-native";
 import { useMutation } from "@tanstack/react-query";
@@ -7,10 +8,11 @@ import Popup from "@/components/Popup";
 import SelectedIdxsContext from "@/contexts/SelectedIdxsContext";
 import TransactionContext from "@/contexts/TransactionContext";
 import UserContext from "@/contexts/UserContext";
-import { colourSpecial, colourTab } from "@/utils/consts";
-import { PurchaseAPI } from "@/utils/types";
+import { colourBackground } from "@/utils/consts";
+import { Colour, PurchaseAPI } from "@/utils/types";
 
 export default function Footer ({ flex }: Readonly<{ flex: number }>) {
+  const router = useRouter ();
   const user = useContext (UserContext);
   const transactions = useContext (TransactionContext);
   const selectedIdxs = useContext (SelectedIdxsContext);
@@ -48,7 +50,7 @@ export default function Footer ({ flex }: Readonly<{ flex: number }>) {
         transactions.remove (selectedIdxs.selectedIdxs);
         selectedIdxs.clear ();
       } catch (error) {
-        console.log (`Fetch Error ${error}`);
+        console.log (`Mutate Error ${error}`);
       } finally {
         setVisibleIndicator (false);
       }
@@ -62,17 +64,18 @@ export default function Footer ({ flex }: Readonly<{ flex: number }>) {
       </Popup>
       <View style = {[ styles.row, { flex: flex } ]}>
         <Grid align = { 2 }>
-          <Panel href = "/drink" title = "Drink" colour = { colourTab }/>
-          <Panel href = "/customisation" title = "Customisation" colour = { colourTab }/>
+          <Panel href = "/drink" title = "Drink" colour = { Colour.tab }/>
+          <Panel href = "/customisation" title = "Customisation" colour = { Colour.tab }/>
         </Grid>
         <Grid align = { 4 }>
-          <Panel title = "Void" colour = { colourSpecial } onPress = { handlePress }/>
-          <Panel href = "/pay" title = "Pay" colour = { colourSpecial }/>
-          <Panel href = "/function" title = "Function" colour = { colourSpecial }/>
-          <Panel href = "/" title = "Exit" colour = { colourSpecial } onPress = { () => {
+          <Panel title = "Void" colour = { Colour.special } onPress = { handlePress }/>
+          <Panel href = "/pay" title = "Pay" colour = { Colour.special }/>
+          <Panel href = "/function" title = "Function" colour = { Colour.special }/>
+          <Panel title = "Exit" colour = { Colour.special } onPress = { () => {
             user.logout ();
             transactions.clear ();
             selectedIdxs.clear ();
+            router.replace ("/");
           } }/>
         </Grid>
       </View>
@@ -82,19 +85,19 @@ export default function Footer ({ flex }: Readonly<{ flex: number }>) {
 
 const styles = StyleSheet.create ({
   input: {
-    backgroundColor: "#25292e",
+    backgroundColor: colourBackground,
     borderWidth: 1,
-    borderColor: "#fff",
+    borderColor: "white",
     paddingLeft: 0.02 * Dimensions.get ("window").height,
     paddingRight: 0.02 * Dimensions.get ("window").height,
   },
   transaction: {
-    backgroundColor: "#25292e",
+    backgroundColor: colourBackground,
     width: 0.4 * Dimensions.get ("window").height,
     height: 0.8 * Dimensions.get ("window").height,
   },
   title: {
-    borderColor: "#fff",
+    borderColor: "white",
     borderTopWidth: 1,
     borderRightWidth: 1,
     borderLeftWidth: 1,

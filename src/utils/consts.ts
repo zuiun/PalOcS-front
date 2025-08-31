@@ -1,7 +1,4 @@
 export const uninitialisedIdx = -1;
-export const colourDefault = "red";
-export const colourSelected = "blue";
-export const colourTab = "green";
-export const colourSpecial = "purple";
+export const colourBackground = "#25292e"; // This particular shade chosen from Expo tutorial
 export const taxRate = 27_00;
 export const currencySymbol = "$";

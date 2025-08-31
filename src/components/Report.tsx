@@ -4,7 +4,7 @@ import { Dimensions, StyleSheet, View } from "react-native";
 import Paragraph from "@/components/Paragraph";
 import Section from "@/components/Section";
 import Separator from "@/components/Separator";
-import { currencySymbol, taxRate } from "@/utils/consts";
+import { colourBackground, currencySymbol, taxRate } from "@/utils/consts";
 import { calculatePrice, convertDecimal } from "@/utils/helpers";
 import { ReportAPI } from "@/utils/types";
 
@@ -137,18 +137,18 @@ export default function Report ({ report }: Readonly<{ report: ReportAPI }>) {
 
 const styles = StyleSheet.create ({
   input: {
-    backgroundColor: "#25292e",
+    backgroundColor: colourBackground,
     borderWidth: 1,
-    borderColor: "#fff",
+    borderColor: "white",
     paddingLeft: 0.02 * Dimensions.get ("window").height,
     paddingRight: 0.02 * Dimensions.get ("window").height,
   },
   transaction: {
-    backgroundColor: "#25292e",
+    backgroundColor: colourBackground,
     width: 0.4 * Dimensions.get ("window").height,
   },
   title: {
-    borderColor: "#fff",
+    borderColor: "white",
     borderTopWidth: 1,
     borderRightWidth: 1,
     borderLeftWidth: 1,
@@ -156,7 +156,7 @@ const styles = StyleSheet.create ({
   list: {
     width: "100%",
     justifyContent: "flex-start",
-    borderColor: "#fff",
+    borderColor: "white",
     borderWidth: 1,
   },
   text: {

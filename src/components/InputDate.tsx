@@ -42,7 +42,7 @@ const styles = StyleSheet.create ({
     alignContent: "center",
   },
   input: {
-    backgroundColor: "#fff",
+    backgroundColor: "white",
     textAlign: "center",
   },
   short: {
