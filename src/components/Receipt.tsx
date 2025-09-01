@@ -15,7 +15,7 @@ export default function Receipt ({ receipt }: Readonly<{ receipt: ReceiptAPI }>)
               { `${receipt.user_id} - ${receipt.user_name}` }
             </Paragraph>
             <Paragraph style = {[ styles.text, styles.right, { flex: 1 } ]}>
-              { receipt.timestamp } CET
+              { receipt.timestamp }
             </Paragraph>
           </View>
         </Section>

@@ -113,7 +113,7 @@ export default function Report ({ report }: Readonly<{ report: ReportAPI }>) {
               { `${report.user_id} - ${report.user_name}` }
             </Paragraph>
             <Paragraph style = {[ styles.text, styles.right, { flex: 1 } ]}>
-              { report.timestamp } CET
+              { report.timestamp }
             </Paragraph>
           </View>
         </Section>

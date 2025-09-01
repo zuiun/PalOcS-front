@@ -9,7 +9,7 @@ import Receipt from "@/components/Receipt";
 import Report from "@/components/Report";
 import Section from "@/components/Section";
 import UserContext from "@/contexts/UserContext";
-import { colourBackground } from "@/utils/consts";
+import { colourBackground, timezone } from "@/utils/consts";
 import { Colour, ReceiptAPI, ReportAPI } from "@/utils/types";
 
 export default function Function () {
@@ -25,7 +25,10 @@ export default function Function () {
   const report = useRef<ReportAPI | undefined> (undefined);
   const handlePressReceipt = async (id: string) => {
     const getTransaction = async () => {
-      const response = await fetch (`${process.env.EXPO_PUBLIC_API_URL}/transaction/${id}`);
+      const params = new URLSearchParams ({
+        timezone: timezone,
+      });
+      const response = await fetch (`${process.env.EXPO_PUBLIC_API_URL}/transaction/${id}?${params}`);
 
       if (response.ok) {
         return await response.json ();
@@ -63,7 +66,10 @@ export default function Function () {
   };
   const handlePressReportDate = async (id: string, date: string) => {
     const getReport = async () => {
-      const response = await fetch (`${process.env.EXPO_PUBLIC_API_URL}/report/${id}/${date}`);
+      const params = new URLSearchParams ({
+        timezone: timezone,
+      });
+      const response = await fetch (`${process.env.EXPO_PUBLIC_API_URL}/report/${id}/${date}?${params}`);
 
       if (response.ok) {
         return await response.json ();

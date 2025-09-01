@@ -12,7 +12,7 @@ import Query from "@/components/Query";
 import SelectedIdxsContext from "@/contexts/SelectedIdxsContext";
 import TransactionContext from "@/contexts/TransactionContext";
 import UserContext from "@/contexts/UserContext";
-import { colourBackground } from "@/utils/consts";
+import { colourBackground, timezone } from "@/utils/consts";
 import { calculateSubtotal, calculateTax } from "@/utils/helpers";
 import { Colour, DiscountAPI, ReceiptAPI, RefundAPI } from "@/utils/types";
 
@@ -41,7 +41,10 @@ export default function Pay () {
       const lines = transactions.toLines ();
       const subtotal = calculateSubtotal (lines);
       const tax = calculateTax (lines);
-      const response = await fetch (`${process.env.EXPO_PUBLIC_API_URL}/transaction`, {
+      const params = new URLSearchParams ({
+        timezone: timezone,
+      });
+      const response = await fetch (`${process.env.EXPO_PUBLIC_API_URL}/transaction?${params}`, {
         method: "POST",
         headers: {
           "Content-Type": "application/json",

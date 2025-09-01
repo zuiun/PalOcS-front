@@ -1,4 +1,4 @@
-import { taxRate } from "@/utils/consts";
+import { decimalSeparator, taxRate } from "@/utils/consts";
 import { LineAPI } from "@/utils/types";
 
 export function convertDecimal (number: number) {
@@ -6,7 +6,7 @@ export function convertDecimal (number: number) {
   const decimals = number % 1_00;
   const decimalsPadded = `${decimals}`.padStart (2, "0");
 
-  return `${units},${decimalsPadded}`;
+  return `${units}${decimalSeparator}${decimalsPadded}`;
 }
 
 export function calculatePrice (price: number, discount?: number) {
